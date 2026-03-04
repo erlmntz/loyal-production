@@ -1,17 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta tags -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Title & Favicon -->
     <title>Loyal Production</title>
+    <link rel="icon" type="image/png" href="images/LP_logo.jpg">
+
+    <!-- Google Fonts (preconnect + combined request) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Playfair+Display:wght@400..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    </head>
+    <link rel="stylesheet" href="css/modal.css">
+
+    <!-- Third-party CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
 <body>
 
     <header>
@@ -26,7 +35,8 @@
         </h2>
         <p id="typewriter-text"></p>
 
-        <a href="#" class="book-now-btn">Book Now</a> 
+        <!-- Real link to booking page -->
+        <a href="booking.html" class="book-now-btn">Book Now</a> 
     </section>
 
     <!-- Services Summary Section -->
@@ -39,9 +49,10 @@
                 <span class="highlight">Same Day Edit</span> service ensures you can relive the magic before the night is over.
             </p>
             <div class="services-buttons">
-                <a href="#" class="btn btn-primary">View packages</a>
-                <a href="#" class="btn btn-secondary">Check availability</a>
-            </div>
+                <!-- Real link to packages page -->
+                <a href="packages.html" class="btn btn-primary">View packages</a>
+                <a href="modal.html" class="btn btn-secondary" id="check-availability-btn">Check availability</a>
+            </div>  
         </div>
     </section>
 
@@ -99,24 +110,11 @@
     <footer>
         <p>&copy; 2026 Loyal Production. All rights reserved.</p>
     </footer>
-    
-    <!-- TypeIt Script -->
-    <script src="https://unpkg.com/typeit@8.7.1/dist/index.umd.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            new TypeIt("#typewriter-text", {
-                strings: ["\"We capture life's most precious moments with creativity and professionalism. Whether it's a wedding, debut, or private party, our team ensures every shot tells your story.\""],
-                speed: 40,
-                waitUntilVisible: true,
-                cursor: true,
-                cursorChar: '|',
-                startDelay: 500,
-                nextStringDelay: 10000,
-                loop: true,
-                loopDelay: 5000 
-            }).go();
-        });
-    </script>
 
+    <!-- Libraries -->
+    <script src="https://unpkg.com/typeit@8.7.1/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Custom Script -->
+    <script src="js/main.js"></script>
 </body>
 </html>
