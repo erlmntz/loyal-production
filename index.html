@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loyal Production</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <img src="LP_logonobg.png" alt="Loyal Production Logo" width="200">
+        <span>Loyal Production</span>
+    </header>
+
+    <section class="banner">
+        <h2>
+            We are Loyal Production
+            <span>Loyal Production is an event photography and videography service provider with affordable packages.</span>
+        </h2>
+        <p id="typewriter-text"></p>
+
+        <a href="#" class="book-now-btn">Book Now</a> 
+    </section>
+
+    <!-- Services Summary Section -->
+    <section class="services-summary">
+        <div class="container">
+            <h3 class="services-tags">Prenup · Wedding · SDE</h3>
+            <h2 class="services-headline">Your story, directed by life</h2>
+            <p class="services-description">
+                Specializing in authentic moments captured with pristine audio and stunning natural light. Our
+                <span class="highlight">Same Day Edit</span> service ensures you can relive the magic before the night is over.
+            </p>
+            <div class="services-buttons">
+                <a href="#" class="btn btn-primary">View packages</a>
+                <a href="#" class="btn btn-secondary">Check availability</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="sample-videos">
+        <div class="container">
+            <h2 class="section-title">Sample Videos</h2>
+            <p class="section-subtitle">Watch our featured work from recent events</p>
+            
+            <div class="video-grid">
+            <!-- Wedding Sample -->
+            <div class="video-card">
+                <div class="video-wrapper">
+                    <video controls preload="metadata">
+                        <source src="wedding.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="video-info">
+                    <h3>Wedding SDE</h3>
+                    <p>Beautiful wedding highlights capturing love and emotions</p>
+                </div>
+            </div>
+
+            <!-- Debut Sample -->
+            <div class="video-card">
+                <div class="video-wrapper">
+                    <video controls preload="metadata">
+                        <source src="debut.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="video-info">
+                    <h3>Debut</h3>
+                    <p>Magical 18th birthday celebration and special moments</p>
+                </div>
+            </div>
+
+            <!-- Birthday Sample -->
+            <div class="video-card">
+                <div class="video-wrapper">
+                    <video controls preload="metadata">
+                        <source src="birthday.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="video-info">
+                    <h3>Birthday</h3>
+                    <p>Fun and memorable birthday party highlights</p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Loyal Production. All rights reserved.</p>
+    </footer>
+    
+    <!-- TypeIt Script -->
+    <script src="https://unpkg.com/typeit@8.7.1/dist/index.umd.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            new TypeIt("#typewriter-text", {
+                strings: ["\"We capture life's most precious moments with creativity and professionalism. Whether it's a wedding, debut, or private party, our team ensures every shot tells your story.\""],
+                speed: 40,
+                waitUntilVisible: true,
+                cursor: true,
+                cursorChar: '|',
+                startDelay: 500,
+                nextStringDelay: 10000,
+                loop: true,
+                loopDelay: 5000 
+            }).go();
+        });
+    </script>
+
+</body>
+</html>
