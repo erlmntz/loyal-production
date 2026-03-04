@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
-
     <header>
         <img src="images/LP_logonobg.png" alt="Loyal Production Logo" width="200">
         <span>Loyal Production</span>
@@ -23,12 +22,11 @@
 
     <section class="booking-section">
         <div class="container">
-            <h1 class="section-title">Book Your Event</h1>
-            <p class="section-subtitle">Tell us about your special occasion and we’ll get back to you within 24 hours.</p>
-
             <div class="booking-form-container">
                 <form id="booking-form">
-                    <!-- Event Type -->
+                    
+
+                    <!-- Event type -->
                     <div class="form-group">
                         <label for="event-type">Event Type *</label>
                         <select id="event-type" name="eventType" required>
@@ -40,37 +38,57 @@
                         </select>
                     </div>
 
-                    <!-- Event Date -->
+                    <!-- Event date -->
                     <div class="form-group">
                         <label for="event-date">Preferred Event Date *</label>
                         <input type="text" id="event-date" name="eventDate" placeholder="Select a date" required readonly>
                     </div>
 
-                    <!-- Name -->
+                    <!-- Service type -->
+                    <fieldset class="form-group radio-group">
+                        <legend>Services Interested In *</legend>
+                        <div class="radio-options">
+                            <label class="radio-label">
+                                <input type="checkbox" name="serviceType[]" value="SDE" required> SDE (Same Day Edit)
+                            </label>
+                            <label class="radio-label">
+                                <input type="checkbox" name="serviceType[]" value="Video Highlight"> Video Highlight
+                            </label>
+                            <label class="radio-label">
+                                <input type="checkbox" name="serviceType[]" value="Photography"> Photography Only
+                            </label>
+                            <label class="radio-label">
+                                <input type="checkbox" name="serviceType[]" value="Videography"> Videography Only
+                            </label>
+                        </div>
+                        <small style="display: block; margin-top: 5px; color: #666;">You can select multiple options.</small>
+                    </fieldset>
+
+                    <!-- Full name -->
                     <div class="form-group">
                         <label for="name">Full Name *</label>
-                        <input type="text" id="name" name="name" placeholder="John Doe" required>
+                        <input type="text" id="name" name="name" placeholder="Enter your full name" required>
                     </div>
 
                     <!-- Email -->
                     <div class="form-group">
                         <label for="email">Email Address *</label>
-                        <input type="email" id="email" name="email" placeholder="john@example.com" required>
+                        <input type="email" id="email" name="email" placeholder="Enter your email address" required>
                     </div>
 
                     <!-- Phone -->
                     <div class="form-group">
                         <label for="phone">Phone Number *</label>
-                        <input type="tel" id="phone" name="phone" placeholder="+63 912 345 6789" required>
+                        <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
                     </div>
 
-                    <!-- Message -->
+                    <!-- Additional details -->
                     <div class="form-group">
                         <label for="message">Additional Details</label>
                         <textarea id="message" name="message" rows="4" placeholder="Tell us more about your event..."></textarea>
                     </div>
 
-                    <!-- Submit Button -->
+                    <!-- Submit -->
                     <button type="submit" class="btn btn-primary submit-btn">Send Booking Request</button>
                 </form>
                 <div id="form-feedback" class="form-feedback"></div>
@@ -78,13 +96,9 @@
         </div>
     </section>
 
-    <footer>
-        <p>&copy; 2026 Loyal Production. All rights reserved.</p>
-    </footer>
-
     <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <!-- Custom booking script -->
+    <!-- Custom script -->
     <script src="js/booking.js"></script>
 </body>
 </html>
