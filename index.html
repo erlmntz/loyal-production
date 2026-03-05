@@ -1,120 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Meta tags -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loyal Production — animated scroll</title>
+  <link rel="icon" type="image/png" href="images/LP_logo.jpg">
 
-    <!-- Title & Favicon -->
-    <title>Loyal Production</title>
-    <link rel="icon" type="image/png" href="images/LP_logo.jpg">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Playfair+Display:wght@400..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
 
-    <!-- Google Fonts (preconnect + combined request) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Playfair+Display:wght@400..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+  <!-- External CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/modal.css">
+  <!-- AOS CSS -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <!-- Third-party CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-    <header>
-        <img src="images/LP_logonobg.png" alt="Loyal Production Logo" width="200">
-        <span>Loyal Production</span>
-    </header>
+  <header>
+    <img src="images/LP_logonobg.png" alt="Loyal Production Logo" width="200">
+    <span>Loyal Production</span>
+  </header>
 
-    <section class="banner">
-        <h2>
-            We are Loyal Production
-            <span>Loyal Production is an event photography and videography service provider with affordable packages.</span>
-        </h2>
-        <p id="typewriter-text"></p>
+  <!-- Hero Banner -->
+  <section class="banner">
+    <h2 data-aos="fade-down" data-aos-duration="800">
+      We are Loyal Production
+      <span>Loyal Production is an event photography and videography service provider with affordable packages.</span>
+    </h2>
+    <p id="typewriter-text" data-aos="fade-up" data-aos-delay="200"></p>
+    <a href="booking.html" class="book-now-btn" data-aos="zoom-in" data-aos-delay="400">Book Now</a>
+  </section>
 
-        <!-- Real link to booking page -->
-        <a href="booking.html" class="book-now-btn">Book Now</a> 
-    </section>
+  <!-- Services Summary -->
+  <section class="services-summary">
+    <div class="container">
+      <h3 class="services-tags" data-aos="fade-right" data-aos-duration="600">Prenup · Wedding · SDE</h3>
+      <h2 class="services-headline" data-aos="fade-left" data-aos-duration="600" data-aos-delay="100">Your story, directed by life</h2>
+      <p class="services-description" data-aos="fade-up" data-aos-delay="200">
+        Specializing in authentic moments captured with pristine audio and stunning natural light. Our
+        <span class="highlight"><strong>Same Day Edit</strong></span> service ensures you can relive the magic before the night is over.
+      </p>
+      <div class="services-buttons" data-aos="fade-up" data-aos-delay="300">
+        <a href="packages.html" class="btn btn-primary">View packages</a>
+        <a href="modal.html" class="btn btn-secondary" id="check-availability-btn">Check availability</a>
+      </div>
+    </div>
+  </section>
 
-    <!-- Services Summary Section -->
-    <section class="services-summary">
-        <div class="container">
-            <h3 class="services-tags">Prenup · Wedding · SDE</h3>
-            <h2 class="services-headline">Your story, directed by life</h2>
-            <p class="services-description">
-                Specializing in authentic moments captured with pristine audio and stunning natural light. Our
-                <span class="highlight">Same Day Edit</span> service ensures you can relive the magic before the night is over.
-            </p>
-            <div class="services-buttons">
-                <!-- Real link to packages page -->
-                <a href="packages.html" class="btn btn-primary">View packages</a>
-                <a href="modal.html" class="btn btn-secondary" id="check-availability-btn">Check availability</a>
-            </div>  
+  <!-- Availability Modal -->
+  <div id="availability-modal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close-btn">&times;</button>
+      <h2>Check Availability</h2>
+      <p>Select a date to see if we're available:</p>
+      <input type="text" id="date-picker" class="form-control" placeholder="Choose a date...">
+      <div id="availability-message" class="availability-status"></div>
+    </div>
+  </div>
+
+  <!-- Photo Gallery (infinite scroll) -->
+  <section class="photo-gallery">
+    <div class="gallery-container">
+      <h1 class="gallery-title" data-aos="fade-down" data-aos-duration="700">Gallery</h1>
+      <div class="gallery-scroll">
+        <div class="gallery-track">
+          <!-- Original images (10) -->
+          <div class="gallery-item"><img src="images/debut/642427753_1374381327821211_8045723827815487016_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/642444870_1374381487821195_244941064692841610_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/642522993_1374380577821286_2617760328348067655_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/642708182_1374380774487933_6674292482722123082_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/642709740_1374380637821280_4007391870565865660_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/643264129_1374380954487915_7903801344163674717_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/643320409_1374381364487874_3415283882022885401_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/643370283_1374381781154499_69065391877813152_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/643381839_1374381457821198_4605435976494130789_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/643396342_1374380641154613_3895694552064111205_n.jpg" alt="Debut photo"></div>
+
+          <!-- Duplicate for seamless loop -->
+          <div class="gallery-item"><img src="images/debut/642427753_1374381327821211_8045723827815487016_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/642444870_1374381487821195_244941064692841610_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/642522993_1374380577821286_2617760328348067655_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/642708182_1374380774487933_6674292482722123082_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/642709740_1374380637821280_4007391870565865660_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/643264129_1374380954487915_7903801344163674717_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/643320409_1374381364487874_3415283882022885401_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/643370283_1374381781154499_69065391877813152_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/643381839_1374381457821198_4605435976494130789_n.jpg" alt="Debut photo"></div>
+          <div class="gallery-item"><img src="images/debut/643396342_1374380641154613_3895694552064111205_n.jpg" alt="Debut photo"></div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <section class="sample-videos">
-        <div class="container">
-            <h2 class="section-title">Sample Videos</h2>
-            <p class="section-subtitle">Watch our featured work from recent events</p>
-            
-            <div class="video-grid">
-            <!-- Wedding Sample -->
-            <div class="video-card">
-                <div class="video-wrapper">
-                    <video controls preload="metadata">
-                        <source src="videos/wedding.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-                <div class="video-info">
-                    <h3>Wedding SDE</h3>
-                    <p>Beautiful wedding highlights capturing love and emotions</p>
-                </div>
-            </div>
-
-            <!-- Debut Sample -->
-            <div class="video-card">
-                <div class="video-wrapper">
-                    <video controls preload="metadata">
-                        <source src="videos/debut.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-                <div class="video-info">
-                    <h3>Debut</h3>
-                    <p>Magical 18th birthday celebration and special moments</p>
-                </div>
-            </div>
-
-            <!-- Birthday Sample -->
-            <div class="video-card">
-                <div class="video-wrapper">
-                    <video controls preload="metadata">
-                        <source src="videos/birthday.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-                <div class="video-info">
-                    <h3>Birthday</h3>
-                    <p>Fun and memorable birthday party highlights</p>
-                </div>
-            </div>
+  <!-- Featured Packages Section -->
+  <section class="featured-section">
+    <div class="featured-container">
+      <h2 class="featured-title" data-aos="fade-right" data-aos-duration="700">Packages</h2>
+      <div class="featured-grid">
+        <div class="featured-item" data-aos="flip-left" data-aos-delay="100" data-aos-duration="600">
+          <img src="images/loyal.jpg" alt="Featured 1">
+          <div class="featured-overlay"><h3>12.5K</h3></div>
         </div>
+        <div class="featured-item" data-aos="flip-left" data-aos-delay="200" data-aos-duration="600">
+          <img src="images/steadfast.jpg" alt="Featured 2">
+          <div class="featured-overlay"><h3>22K</h3></div>
         </div>
-    </section>    
+        <div class="featured-item" data-aos="flip-left" data-aos-delay="300" data-aos-duration="600">
+          <img src="images/devoted.jpg" alt="Featured 3">
+          <div class="featured-overlay"><h3>24K</h3></div>
+        </div>
+        <div class="featured-item" data-aos="flip-left" data-aos-delay="400" data-aos-duration="600">
+          <img src="images/faithful.jpg" alt="Featured 4">
+          <div class="featured-overlay"><h3>35.5k</h3></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <footer>
-        <p>&copy; 2026 Loyal Production. All rights reserved.</p>
-    </footer>
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 Loyal Production. All rights reserved.</p>
+  </footer>
 
-    <!-- Libraries -->
-    <script src="https://unpkg.com/typeit@8.7.1/dist/index.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <!-- Custom Script -->
-    <script src="js/main.js"></script>
+  <!-- Libraries -->
+  <script src="https://unpkg.com/typeit@8.7.1/dist/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <!-- AOS Init (play on every scroll) -->
+  <script>
+    AOS.init({
+      duration: 800,
+      once: false,
+      offset: 120,
+      easing: 'ease-in-out'
+    });
+  </script>
+
+  <!-- Custom scripts -->
+  <script src="js/main.js"></script>
+  <script src="js/modal.js"></script>
 </body>
 </html>
