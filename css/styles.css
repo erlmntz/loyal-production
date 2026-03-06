@@ -1,4 +1,4 @@
-/* ===== Base Styles ===== */
+/* ===== Base ===== */
 body {
   font-family: 'Arial', sans-serif;
   margin: 0;
@@ -6,13 +6,13 @@ body {
   background-color: #f4f4f4;
 }
 
-/* ----- Header ----- */
+/* ===== Header ===== */
 header {
-  background-color: #000000;
+  background-color: #000;
   padding: 15px 30px;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;           /* allow wrapping on small screens */
+  flex-wrap: wrap;
   gap: 15px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -36,7 +36,7 @@ header span {
   font-family: 'Montserrat', 'Roboto', sans-serif;
 }
 
-/* ----- Banner ----- */
+/* ===== Banner ===== */
 .banner {
   box-sizing: border-box;
   background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
@@ -61,7 +61,7 @@ header span {
 .banner h2 {
   font-size: 60px;
   font-weight: 800;
-  margin: 0 0 20px 0;
+  margin: 0 0 20px;
   font-family: 'Playfair Display', 'Montserrat', serif;
   color: rgb(156, 136, 77);
   line-height: 1.2;
@@ -96,20 +96,49 @@ header span {
   min-height: 80px;
 }
 
+/* ===== Banner Buttons Container ===== */
+.banner-buttons {
+  display: flex;
+  flex-direction: column;    /* stack vertically */
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 300px;          /* consistent width */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Both buttons full width */
+.banner-buttons .book-now-btn,
+.banner-buttons .schedule-meeting-btn {
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Unified base dimensions for both buttons */
+.book-now-btn,
+.schedule-meeting-btn {
+  padding: 14px 20px;
+  font-size: 18px;
+  text-decoration: none;      /* ← FIX: removes underline from anchor */
+}
+
+/* Individual styles for Book Now button */
 .book-now-btn {
   display: inline-block;
   background-color: transparent;
   color: rgb(156, 136, 77);
-  font-size: 18px;
+  font-size: 18px;          /* will be overridden by unified rule, kept for clarity */
   font-weight: 600;
-  padding: 14px 40px;
+  padding: 14px 20px;        /* updated to match unified */
   border-radius: 50px;
   text-decoration: none;
   letter-spacing: 1px;
   text-transform: uppercase;
   font-family: 'Montserrat', 'Roboto', sans-serif;
   transition: all 0.3s ease;
-  margin-top: 20px;
   border: 2px solid #b89b5e;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   animation: heartbeat-glow 1.5s ease-in-out infinite;
@@ -134,7 +163,48 @@ header span {
   100% { box-shadow: 0 0 5px rgba(156, 136, 77, 0.3); }
 }
 
-/* ----- Services Summary ----- */
+/* ===== Schedule Meeting Button ===== */
+.schedule-meeting-btn {
+  background-color: rgb(156, 136, 77);
+  color: #000;
+  border: 2px solid rgb(156, 136, 77);
+  padding: 14px 20px;        /* updated to match unified */
+  font-size: 18px;           /* will be overridden by unified rule */
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: 'Montserrat', 'Roboto', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(156, 136, 77, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  animation: soft-pulse 2s ease-in-out infinite; /* subtle pulse effect */
+}
+
+.schedule-meeting-btn i {
+  font-size: 20px;
+}
+
+.schedule-meeting-btn:hover {
+  background-color: transparent;
+  color: rgb(156, 136, 77);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(156, 136, 77, 0.4);
+  animation: none;
+}
+
+/* Soft pulse animation */
+@keyframes soft-pulse {
+  0% { box-shadow: 0 2px 10px rgba(156, 136, 77, 0.3); }
+  50% { box-shadow: 0 2px 20px rgba(156, 136, 77, 0.7); }
+  100% { box-shadow: 0 2px 10px rgba(156, 136, 77, 0.3); }
+}
+
+/* ===== Services Summary ===== */
 .services-summary {
   background-color: #fff;
   padding: 60px 20px;
@@ -217,7 +287,7 @@ header span {
   transform: translateY(-3px);
 }
 
-/* ----- Modal ----- */
+/* ===== Availability Modal ===== */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -229,6 +299,7 @@ header span {
   z-index: 1000;
   justify-content: center;
   align-items: center;
+  transition: background-color 0.2s ease;
 }
 
 .modal-overlay.active {
@@ -249,10 +320,52 @@ header span {
   position: absolute;
   top: 10px;
   right: 15px;
-  font-size: 1.5rem;
+  font-size: 2rem;
+  line-height: 1;
+  color: #aaa;
   cursor: pointer;
   background: none;
   border: none;
+  padding: 0 8px;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.modal-close:hover {
+  color: rgb(156, 136, 77);
+  transform: scale(1.1);
+}
+
+.modal-content h2 {
+  font-family: 'Playfair Display', 'Montserrat', serif;
+  color: rgb(156, 136, 77);
+  margin-top: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.modal-content p {
+  font-family: 'Arial', sans-serif;
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-family: 'Arial', sans-serif;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  outline: none;
+  margin-bottom: 10px;
+}
+
+.form-control:focus {
+  border-color: rgb(156, 136, 77);
+  box-shadow: 0 0 0 3px rgba(156, 136, 77, 0.25);
 }
 
 .availability-status {
@@ -272,6 +385,23 @@ header span {
   color: #721c24;
 }
 
+/* Flatpickr customisation */
+.flatpickr-calendar {
+  font-family: 'Arial', sans-serif;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.flatpickr-day.selected {
+  background: rgb(156, 136, 77);
+  border-color: rgb(156, 136, 77);
+}
+
+.flatpickr-day.selected:hover {
+  background: #b89b5e;
+  border-color: #b89b5e;
+}
+
 .flatpickr-day.booked {
   background-color: #ffcccc !important;
   color: #cc0000 !important;
@@ -279,9 +409,9 @@ header span {
   border-color: #ff9999;
 }
 
-/* ----- Photo Gallery (infinite scroll) ----- */
+/* ===== Photo Gallery (infinite scroll) ===== */
 .photo-gallery {
-  background-color: #000000;
+  background-color: #000;
   padding: 80px 20px;
   text-align: center;
   overflow: hidden;
@@ -351,7 +481,35 @@ header span {
   100% { transform: translateX(calc(-50% - 12.5px)); }
 }
 
-/* ----- Featured Packages Section ----- */
+/* ===== SDE Videos ===== */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 20px 60px 20px;
+}
+
+.video-item {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.video-item iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ===== Featured Packages ===== */
 .featured-section {
   background-color: #2a2a2a;
   padding: 80px 20px;
@@ -429,7 +587,7 @@ header span {
   color: rgb(156, 136, 77);
 }
 
-/* ----- Footer ----- */
+/* ===== Footer ===== */
 footer {
   background-color: #000;
   padding: 30px 20px;
@@ -442,7 +600,7 @@ footer p {
   font-size: 16px;
 }
 
-/* ===== Responsive Styles ===== */
+/* ===== Responsive ===== */
 @media (max-width: 992px) {
   .banner h2 {
     font-size: 48px;
@@ -455,6 +613,10 @@ footer p {
   .featured-title {
     font-size: 36px;
   }
+  .video-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -462,9 +624,16 @@ footer p {
   header {
     justify-content: center;
     text-align: center;
+    flex-direction: column;
+    align-items: stretch;
   }
+  
   header span {
     font-size: 20px;
+  }
+  
+  header img {
+    align-self: center;
   }
 
   /* Banner */
@@ -472,19 +641,25 @@ footer p {
     padding: 80px 15px;
     min-height: auto;
   }
+  
   .banner h2 {
     font-size: 36px;
   }
+  
   .banner h2 span {
     font-size: 16px;
   }
+  
   #typewriter-text {
     font-size: 16px;
     margin: 20px auto;
   }
-  .book-now-btn {
+
+  /* Banner Buttons – already stacked, just ensure sizing */
+  .banner-buttons .book-now-btn,
+  .banner-buttons .schedule-meeting-btn {
+    padding: 12px 20px;
     font-size: 16px;
-    padding: 12px 30px;
   }
 
   /* Services */
@@ -516,6 +691,11 @@ footer p {
   .gallery-item img {
     height: 285px;
   }
+  .video-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 15px 40px 15px;
+  }
 
   /* Featured */
   .featured-section {
@@ -526,11 +706,11 @@ footer p {
     margin-bottom: 30px;
   }
   .featured-grid {
-    grid-template-columns: 1fr;  /* single column */
+    grid-template-columns: 1fr;
     gap: 20px;
   }
   .featured-overlay {
-    opacity: 1;                   /* always visible on mobile */
+    opacity: 1;
     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
   }
   .featured-overlay h3 {
@@ -545,6 +725,18 @@ footer p {
   .banner h2 span {
     font-size: 14px;
   }
+  
+  /* Banner Buttons */
+  .banner-buttons {
+    max-width: 260px;
+  }
+  
+  .banner-buttons .book-now-btn,
+  .banner-buttons .schedule-meeting-btn {
+    font-size: 14px;
+    padding: 10px 15px;
+  }
+
   .services-headline,
   .gallery-title,
   .featured-title {
@@ -567,5 +759,22 @@ footer p {
   }
   .gallery-item img {
     height: 210px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .banner-buttons {
+    max-width: 220px;
+  }
+  
+  .banner-buttons .book-now-btn,
+  .banner-buttons .schedule-meeting-btn {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  
+  .schedule-meeting-btn i {
+    font-size: 14px;
   }
 }

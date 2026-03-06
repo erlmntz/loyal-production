@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loyal Production — animated scroll</title>
+  <title>Loyal Production | Online Booking</title>
   <link rel="icon" type="image/png" href="images/LP_logo.jpg">
 
   <!-- Google Fonts -->
@@ -14,6 +14,9 @@
   <!-- External CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
   <!-- AOS CSS -->
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
@@ -23,8 +26,9 @@
 <body>
 
   <header>
-    <img src="images/LP_logonobg.png" alt="Loyal Production Logo" width="200">
-    <span>Loyal Production</span>
+      <img src="images/LP_logonobg.png" alt="Loyal Production Logo" width="200">
+      <span>Loyal Production</span>
+</button>
   </header>
 
   <!-- Hero Banner -->
@@ -34,7 +38,17 @@
       <span>Loyal Production is an event photography and videography service provider with affordable packages.</span>
     </h2>
     <p id="typewriter-text" data-aos="fade-up" data-aos-delay="200"></p>
-    <a href="booking.html" class="book-now-btn" data-aos="zoom-in" data-aos-delay="400">Book Now</a>
+    <div class="banner-buttons">
+      <a href="booking.html" class="book-now-btn" data-aos="zoom-in" data-aos-delay="400">Book Now</a>
+      <a href="https://calendly.com/earlpapogijr-12/check-availability" 
+        class="schedule-meeting-btn" 
+        data-aos="zoom-in" 
+        data-aos-delay="500" 
+        target="_blank" 
+        rel="noopener noreferrer">
+        <i class="bi bi-calendar-check"></i> Schedule Meeting
+      </a>
+    </div>  
   </section>
 
   <!-- Services Summary -->
@@ -96,6 +110,19 @@
         </div>
       </div>
     </div>
+    <!-- SDE Videos -->
+      <h1 class="gallery-title" data-aos="fade-down" data-aos-duration="700">SDE</h1>
+      <div class="video-grid">
+        <div class="video-item">
+          <iframe src="https://www.youtube.com/embed/GAn0ajBGYkQ?si=6J-8XqEZWG7kblcR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <div class="video-item">
+          <iframe src="https://www.youtube.com/embed/YIAcsm3rgdI?si=vnKbgrWwGYggxoXQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <div class="video-item">
+          <iframe src="https://www.youtube.com/embed/OEsYQJ30Fvk?si=rf4n7ntSr3Ya-red" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
   </section>
 
   <!-- Featured Packages Section -->
