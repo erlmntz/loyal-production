@@ -27,13 +27,14 @@ header img:hover {
   transform: scale(1.02);
 }
 
-header span {
+header h1 {
   font-size: 25px;
   font-weight: 600;
   color: rgb(156, 136, 77);
   letter-spacing: 1px;
   text-transform: uppercase;
   font-family: 'Montserrat', 'Roboto', sans-serif;
+  margin: 0;
 }
 
 /* ===== Banner ===== */
@@ -44,10 +45,9 @@ header span {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
   width: 100%;
-  padding: 100px 20px;
-  min-height: 500px;
+  min-height: 100vh;
+  padding: 120px 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -55,11 +55,10 @@ header span {
   text-align: center;
   color: #fff;
   position: relative;
-  overflow: hidden;
 }
 
 .banner h2 {
-  font-size: 60px;
+  font-size: clamp(32px, 6vw, 60px);
   font-weight: 800;
   margin: 0 0 20px;
   font-family: 'Playfair Display', 'Montserrat', serif;
@@ -73,7 +72,7 @@ header span {
 
 .banner h2 span {
   display: block;
-  font-size: 20px;
+  font-size: clamp(16px, 2.5vw, 20px);
   font-weight: 400;
   color: rgb(156, 136, 77);
   margin-top: 15px;
@@ -86,7 +85,7 @@ header span {
 }
 
 #typewriter-text {
-  font-size: 18px;
+  font-size: clamp(16px, 2.5vw, 18px);
   line-height: 1.8;
   color: #fff;
   max-width: 800px;
@@ -99,12 +98,12 @@ header span {
 /* ===== Banner Buttons Container ===== */
 .banner-buttons {
   display: flex;
-  flex-direction: column;    /* stack vertically */
+  flex-direction: column;
   align-items: center;
   gap: 15px;
   margin-top: 20px;
   width: 100%;
-  max-width: 300px;          /* consistent width */
+  max-width: 300px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -122,7 +121,7 @@ header span {
 .schedule-meeting-btn {
   padding: 14px 20px;
   font-size: 18px;
-  text-decoration: none;      /* ← FIX: removes underline from anchor */
+  text-decoration: none;
 }
 
 /* Individual styles for Book Now button */
@@ -130,9 +129,9 @@ header span {
   display: inline-block;
   background-color: transparent;
   color: rgb(156, 136, 77);
-  font-size: 18px;          /* will be overridden by unified rule, kept for clarity */
+  font-size: 18px;
   font-weight: 600;
-  padding: 14px 20px;        /* updated to match unified */
+  padding: 14px 20px;
   border-radius: 50px;
   text-decoration: none;
   letter-spacing: 1px;
@@ -168,8 +167,8 @@ header span {
   background-color: rgb(156, 136, 77);
   color: #000;
   border: 2px solid rgb(156, 136, 77);
-  padding: 14px 20px;        /* updated to match unified */
-  font-size: 18px;           /* will be overridden by unified rule */
+  padding: 14px 20px;
+  font-size: 18px;
   font-weight: 600;
   border-radius: 50px;
   cursor: pointer;
@@ -182,7 +181,7 @@ header span {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  animation: soft-pulse 2s ease-in-out infinite; /* subtle pulse effect */
+  animation: soft-pulse 2s ease-in-out infinite;
 }
 
 .schedule-meeting-btn i {
@@ -628,7 +627,7 @@ footer p {
     align-items: stretch;
   }
   
-  header span {
+  header h1 {
     font-size: 20px;
   }
   
@@ -638,8 +637,9 @@ footer p {
 
   /* Banner */
   .banner {
-    padding: 80px 15px;
-    min-height: auto;
+    min-height: 80vh;
+    padding: 100px 15px;
+    background-attachment: scroll;
   }
   
   .banner h2 {
@@ -655,7 +655,7 @@ footer p {
     margin: 20px auto;
   }
 
-  /* Banner Buttons – already stacked, just ensure sizing */
+  /* Banner Buttons */
   .banner-buttons .book-now-btn,
   .banner-buttons .schedule-meeting-btn {
     padding: 12px 20px;
@@ -719,9 +719,15 @@ footer p {
 }
 
 @media (max-width: 480px) {
+  .banner {
+    min-height: 70vh;
+    padding: 80px 12px;
+  }
+  
   .banner h2 {
     font-size: 28px;
   }
+  
   .banner h2 span {
     font-size: 14px;
   }
@@ -764,6 +770,10 @@ footer p {
 
 /* Extra small devices */
 @media (max-width: 360px) {
+  .banner {
+    padding: 60px 10px;
+  }
+  
   .banner-buttons {
     max-width: 220px;
   }
