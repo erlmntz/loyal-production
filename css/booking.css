@@ -35,6 +35,8 @@
     padding: 30px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     border: 1px solid #eaeaea;
+    display: flex;           /* added */
+    flex-direction: column;  /* added */
 }
 
 .form-group {
@@ -99,56 +101,78 @@
     min-height: 80px;
 }
 
-/* Checkbox styling (formerly radio buttons) */
+/* ===== Custom Radio Buttons (Loyal, Steadfast, Devoted, Faithful) ===== */
 .radio-options {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px 20px;
+    gap: 16px 24px;
+    margin: 10px 0 0 0;
 }
 
-.radio-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'Roboto', sans-serif;
-    font-size: 15px;
-    color: #333;
-    cursor: pointer;
-}
-
-.radio-label input[type="checkbox"] {
+/* Hide the native radio */
+.radio-label input[type="radio"] {
     position: absolute;
     opacity: 0;
     width: 0;
     height: 0;
 }
 
+/* Radio container – flex for perfect alignment */
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    line-height: 1.4;
+    transition: color 0.2s ease;
+}
+
+/* Custom radio circle */
 .radio-label::before {
     content: '';
     display: inline-block;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border: 2px solid #b89b5e;
-    border-radius: 4px;  /* Square para sa checkbox */
+    border-radius: 50%;
     background: #fff;
-    transition: 0.15s;
     box-sizing: border-box;
     flex-shrink: 0;
+    transition: all 0.15s ease;
 }
 
-.radio-label:has(input[type="checkbox"]:checked)::before {
+/* Checked state – inner dot */
+.radio-label:has(input[type="radio"]:checked)::before {
     background-color: #b89b5e;
-    /* Magdagdag ng checkmark */
-    content: '✓';
-    color: white;
-    font-size: 14px;
-    text-align: center;
-    line-height: 18px;
-    font-weight: bold;
+    box-shadow: inset 0 0 0 4px white;
 }
 
-.radio-label:has(input[type="checkbox"]:focus)::before {
+/* Focus state for accessibility */
+.radio-label:has(input[type="radio"]:focus)::before {
     box-shadow: 0 0 0 3px rgba(184, 155, 94, 0.3);
+}
+
+/* Hover effect */
+.radio-label:hover::before {
+    border-color: #a6894d;
+    background-color: #faf3e0;
+}
+
+.radio-label:hover {
+    color: #b89b5e;
+}
+
+/* Helper text styling */
+.radio-group small {
+    display: block;
+    margin-top: 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    color: #777;
+    font-style: italic;
 }
 
 /* Submit button */
@@ -195,6 +219,33 @@
     border: 1px solid #f5c6cb;
 }
 
+/* Back button */
+.back-btn {
+    background: none;
+    border: none;
+    color: #b89b5e;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Montserrat', sans-serif;
+    transition: color 0.2s;
+    /* margin-left: -5px;  ← removed */
+    align-self: flex-end;   /* added */
+}
+
+.back-btn:hover {
+    color: #a6894d;
+}
+
+.back-btn i {
+    font-size: 1.2em;  /* makes icon slightly larger relative to text */
+    line-height: 1;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .booking-form-container {
@@ -202,7 +253,7 @@
     }
     .radio-options {
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 12px;
     }
 }
 

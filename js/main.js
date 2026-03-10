@@ -13,3 +13,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }).go();
     
     });
+
+// AOS Init (play on every scroll) 
+    AOS.init({
+      duration: 800,
+      once: false,
+      offset: 120,
+      easing: 'ease-in-out'
+    });
