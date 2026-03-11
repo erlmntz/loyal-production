@@ -49,13 +49,10 @@
 <body>
 
   <header>
-    <!-- Logo and h1 together: hide h1 visually to avoid screen reader duplication,
-         or remove h1 and rely on the logo alt text -->
     <a href="/" aria-label="Loyal Production - Home">
-      <img src="images/LP_logonobg.png" alt="Loyal Production" width="200" height="auto">
+      <img src="images/LP_logonobg.png" alt="Loyal Production Logo" width="50" height="auto">
     </a>
-    <!-- h1 is visually hidden but still present for SEO/accessibility -->
-    <h1 class="visually-hidden">Loyal Production</h1>
+    <h1>Loyal Production</h1>
   </header>
 
   <!-- Hero Banner -->
@@ -91,7 +88,8 @@
         <span class="highlight"><strong>Same Day Edit</strong></span> service ensures you can relive the magic before the night is over.
       </p>
       <div class="services-buttons" data-aos="fade-up" data-aos-delay="300">
-        <a href="packages.html" class="btn btn-primary">View packages</a>
+        <!-- Updated button: href now points to #packages -->
+        <a href="#packages" class="btn btn-primary">View packages</a>
         <a href="check-availability.html" class="btn btn-secondary" id="check-availability-btn">Check availability</a>
       </div>
     </div>
@@ -115,7 +113,7 @@
           <div class="gallery-item"><img src="images/debut/643381839_1374381457821198_4605435976494130789_n.jpg" alt="Debut event photo 9" width="400" height="300" loading="lazy"></div>
           <div class="gallery-item"><img src="images/debut/643396342_1374380641154613_3895694552064111205_n.jpg" alt="Debut event photo 10" width="400" height="300" loading="lazy"></div>
 
-          <!-- Duplicates for seamless loop — hidden from assistive technologies -->
+          <!-- Duplicates for seamless loop -->
           <div class="gallery-item" aria-hidden="true"><img src="images/debut/642427753_1374381327821211_8045723827815487016_n.jpg" alt="" width="400" height="300" loading="lazy"></div>
           <div class="gallery-item" aria-hidden="true"><img src="images/debut/642444870_1374381487821195_244941064692841610_n.jpg" alt="" width="400" height="300" loading="lazy"></div>
           <div class="gallery-item" aria-hidden="true"><img src="images/debut/642522993_1374380577821286_2617760328348067655_n.jpg" alt="" width="400" height="300" loading="lazy"></div>
@@ -171,8 +169,8 @@
     </div>
   </section>
 
-  <!-- Featured Packages Section -->
-  <section class="featured-section" aria-label="Photography Packages">
+  <!-- Featured Packages Section (with added id="packages") -->
+  <section id="packages" class="featured-section" aria-label="Photography Packages">
     <div class="featured-container">
       <h2 class="featured-title" data-aos="fade-right" data-aos-duration="700">Packages</h2>
       <div class="featured-grid">
@@ -209,6 +207,9 @@
   <!-- Custom scripts -->
   <script src="js/main.js" defer></script>
   <script src="js/modal.js" defer></script>
+
+   <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 </body>
 </html>
