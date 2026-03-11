@@ -1,0 +1,433 @@
+/* ========== RESET & BASE ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+}
+
+/* ========== DASHBOARD LAYOUT ========== */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ========== SIDEBAR (BLACK) ========== */
+.sidebar {
+  width: 260px;
+  background: #000000;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+}
+
+.sidebar-header {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-header .logo {
+  max-width: 120px;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-header h2 {
+  color: rgb(156, 136, 77);
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 2rem 0;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+}
+
+.sidebar-nav li {
+  padding: 1rem 1.5rem;
+  margin: 0.25rem 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  transition: all 0.2s;
+  border-left: 4px solid transparent;
+}
+
+.sidebar-nav li i {
+  font-size: 1.2rem;
+  width: 24px;
+  color: rgb(156, 136, 77);
+}
+
+.sidebar-nav li:hover {
+  background: rgba(255,255,255,0.05);
+  border-left-color: rgb(156, 136, 77);
+}
+
+.sidebar-nav li.active {
+  background: rgba(156, 136, 77, 0.15);
+  border-left-color: rgb(156, 136, 77);
+  font-weight: 500;
+}
+
+.sidebar-footer {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #aaa;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ========== MAIN CONTENT ========== */
+.main-content {
+  margin-left: 260px;
+  flex: 1;
+  padding: 2rem;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.content-section {
+  display: none;
+}
+
+.content-section.active {
+  display: block;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.btn-refresh {
+  background: transparent;
+  border: 1px solid rgb(156, 136, 77);
+  color: rgb(156, 136, 77);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: 0.2s;
+}
+
+.btn-refresh:hover {
+  background: rgb(156, 136, 77);
+  color: #fff;
+}
+
+/* ========== STATS CARDS (DASHBOARD) ========== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-left: 4px solid rgb(156, 136, 77);
+}
+
+.stat-card i {
+  font-size: 2.5rem;
+  color: rgb(156, 136, 77);
+}
+
+.stat-card h3 {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.stat-card p {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Hide extra stat cards (only first shown) */
+.stat-card:not(:first-child) {
+  display: none;
+}
+
+/* ========== TABLES ========== */
+.table-responsive {
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 1rem;
+}
+
+.bookings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.bookings-table th {
+  text-align: left;
+  padding: 1rem 0.5rem;
+  background: #f2f2f2;
+  color: #333;
+  font-weight: 600;
+  border-bottom: 2px solid #ddd;
+}
+
+.bookings-table td {
+  padding: 0.9rem 0.5rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.bookings-table tr:hover {
+  background: #f9f9f9;
+}
+
+/* Status badges (used in table and modal) */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: #e0e0e0;
+  color: #333;
+}
+
+.status-badge.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.accepted {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.declined {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* For inline status in modal (using status-pending etc.) */
+.status-pending { background: #ffc107; color: #000; }
+.status-accepted { background: #28a745; color: #fff; }
+.status-declined { background: #dc3545; color: #fff; }
+
+/* Action buttons */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-accept, .btn-decline, .btn-view {
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: 0.2s;
+  background: #fff;
+  border: 1px solid;
+}
+
+.btn-accept {
+  color: #28a745;
+  border-color: #28a745;
+}
+.btn-accept:hover {
+  background: #28a745;
+  color: #fff;
+}
+
+.btn-decline {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+.btn-decline:hover {
+  background: #dc3545;
+  color: #fff;
+}
+
+.btn-view {
+  color: #17a2b8;
+  border-color: #17a2b8;
+}
+.btn-view:hover {
+  background: #17a2b8;
+  color: #fff;
+}
+
+.btn-accept:disabled, .btn-decline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* For inline action buttons (kept for compatibility) */
+.action-btn {
+  margin: 0 4px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+/* Recent preview table */
+.recent-preview {
+  margin-top: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.recent-preview h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #000;
+}
+
+/* Message cell */
+.message-cell {
+  max-width: 250px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* ========== MODAL STYLES ========== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.close-modal {
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.booking-detail {
+  display: flex;
+  margin-bottom: 10px;
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 8px;
+}
+
+.detail-label {
+  font-weight: 600;
+  width: 120px;
+  color: #555;
+}
+
+.detail-value {
+  flex: 1;
+  word-break: break-word;
+}
+
+/* ========== EVENT SECTION PLACEHOLDER ========== */
+#event-section {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  text-align: center;
+  color: #666;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 70px;
+    overflow: hidden;
+  }
+  .sidebar-header h2, .sidebar-footer p, .sidebar-nav li span {
+    display: none;
+  }
+  .sidebar-nav li {
+    justify-content: center;
+    padding: 1rem 0;
+  }
+  .sidebar-nav li i {
+    margin: 0;
+  }
+  .main-content {
+    margin-left: 70px;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
