@@ -16,6 +16,11 @@
   const PASSWORD_HASH =
     'd2e70743862d41f1b183e4583088e50e3bd2e46b8133ec94fb29212f9c75af28';
   const STORAGE_KEY = 'lp.admin.unlocked';
+  // The plaintext password is also stashed (tab-scoped) so the admin can
+  // authenticate against the serverless email function. sessionStorage is
+  // tab-scoped and cleared on close. We accept this trade-off because the
+  // alternative is asking the admin to type the password again per email.
+  const TOKEN_KEY = 'lp.admin.token';
   const UNLOCK_EVENT = 'lp:admin-unlocked';
 
   async function sha256(text) {
@@ -34,17 +39,27 @@
     }
   }
 
-  function markUnlocked() {
+  function markUnlocked(token) {
     try {
       sessionStorage.setItem(STORAGE_KEY, '1');
+      if (token != null) sessionStorage.setItem(TOKEN_KEY, token);
     } catch (e) {
       /* ignore quota errors */
+    }
+  }
+
+  function getToken() {
+    try {
+      return sessionStorage.getItem(TOKEN_KEY) || '';
+    } catch (e) {
+      return '';
     }
   }
 
   function lock() {
     try {
       sessionStorage.removeItem(STORAGE_KEY);
+      sessionStorage.removeItem(TOKEN_KEY);
     } catch (e) {
       /* ignore */
     }
@@ -124,7 +139,7 @@
         try {
           const hash = await sha256(value);
           if (hash === PASSWORD_HASH) {
-            markUnlocked();
+            markUnlocked(value);
             overlay.classList.add('is-unlocking');
             setTimeout(() => {
               overlay.remove();
@@ -154,6 +169,7 @@
   window.LP.adminAuth = {
     isUnlocked,
     lock,
+    getToken,
     UNLOCK_EVENT,
   };
 

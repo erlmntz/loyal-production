@@ -885,6 +885,172 @@ body[data-locked="true"] .sidebar-toggle {
   color: var(--text-primary);
 }
 
+/* Accept booking modal-specific styles ---------------------------- */
+.accept-summary {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  background: #faf8f3;
+  border: 1px solid #eee5cf;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.accept-summary-email {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+.accept-field-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  margin-top: 1rem;
+}
+
+.accept-field-hint {
+  display: block;
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.accept-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.accept-input-prefix {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.85rem;
+  background: #faf8f3;
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  font-weight: 600;
+  color: var(--brand);
+  font-size: 1rem;
+}
+
+.accept-input-wrap input[type="number"] {
+  flex: 1;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.accept-input-wrap input[type="number"]:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(156, 136, 77, 0.18);
+}
+
+.accept-downpayment {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.accept-downpayment.is-active {
+  color: var(--brand);
+  font-style: normal;
+  font-weight: 600;
+}
+
+#acceptModal textarea#accept-note {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background: #fff;
+  resize: vertical;
+  min-height: 70px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#acceptModal textarea#accept-note:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(156, 136, 77, 0.18);
+}
+
+.accept-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.accept-checkbox input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+
+.accept-feedback {
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  min-height: 1.2em;
+  line-height: 1.45;
+}
+
+.accept-feedback.is-working {
+  color: var(--brand);
+}
+
+.accept-feedback.is-success {
+  color: #1f7a3d;
+  font-weight: 600;
+}
+
+.accept-feedback.is-error {
+  color: #b41e1e;
+  font-weight: 600;
+}
+
+#acceptModal .btn-confirm {
+  background: var(--brand);
+  border-color: var(--brand);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+#acceptModal .btn-confirm:hover {
+  background: #856f3a;
+  border-color: #856f3a;
+}
+
+#acceptModal .btn-confirm:disabled,
+#acceptModal .btn-cancel:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 /* ================================================================
    10. PASSWORD GATE OVERLAY
 ================================================================ */

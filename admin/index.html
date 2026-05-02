@@ -225,6 +225,57 @@
     </div>
   </div>
 
+  <!-- Accept Booking Modal -->
+  <div id="acceptModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Accept Booking</h2>
+        <span class="close-modal" id="acceptModalClose">&times;</span>
+      </div>
+      <div>
+        <p id="accept-summary" class="accept-summary"></p>
+        <label class="accept-field-label" for="accept-total">
+          Quoted total price (optional)
+          <span class="accept-field-hint">Leave blank to send "50% of the agreed total" without an amount.</span>
+        </label>
+        <div class="accept-input-wrap">
+          <span class="accept-input-prefix">₱</span>
+          <input
+            type="number"
+            id="accept-total"
+            min="0"
+            step="0.01"
+            placeholder="e.g. 15000" />
+        </div>
+        <p id="accept-downpayment-preview" class="accept-downpayment"></p>
+
+        <label class="accept-field-label" for="accept-note">
+          Optional note to client
+          <span class="accept-field-hint">Will appear in a highlighted block in the email.</span>
+        </label>
+        <textarea
+          id="accept-note"
+          rows="3"
+          placeholder="e.g. We'll confirm your shoot start time once payment is received."></textarea>
+
+        <label class="accept-checkbox">
+          <input type="checkbox" id="accept-send-email" checked>
+          <span>Send acceptance email with downpayment instructions</span>
+        </label>
+
+        <p id="accept-feedback" class="accept-feedback" role="status" aria-live="polite"></p>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="acceptModalCancel">Cancel</button>
+          <button type="button" class="btn-confirm" id="acceptModalConfirm">
+            <i class="bi bi-check2-circle"></i>
+            <span id="acceptModalConfirmLabel">Accept &amp; Send Email</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Decline Reason Modal -->
   <div id="declineReasonModal" class="modal">
     <div class="modal-content">

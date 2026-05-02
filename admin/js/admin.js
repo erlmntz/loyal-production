@@ -58,10 +58,22 @@
     const detailsBody = document.getElementById('modal-body');
     const declineModal = document.getElementById('declineReasonModal');
     const declineReasonInput = document.getElementById('declineReason');
+    const acceptModal = document.getElementById('acceptModal');
+    const acceptSummary = document.getElementById('accept-summary');
+    const acceptTotalInput = document.getElementById('accept-total');
+    const acceptDownpaymentPreview = document.getElementById('accept-downpayment-preview');
+    const acceptNoteInput = document.getElementById('accept-note');
+    const acceptSendEmailToggle = document.getElementById('accept-send-email');
+    const acceptFeedback = document.getElementById('accept-feedback');
+    const acceptConfirmBtn = document.getElementById('acceptModalConfirm');
+    const acceptConfirmLabel = document.getElementById('acceptModalConfirmLabel');
+    const acceptCancelBtn = document.getElementById('acceptModalCancel');
+    const acceptCloseBtn = document.getElementById('acceptModalClose');
 
     // ---------- State ----------
     let allBookings = [];
     let currentDeclineId = null;
+    let currentAcceptId = null;
     const search = { request: '', accepted: '', declined: '', event: '' };
 
     // ---------- Helpers ----------
@@ -233,6 +245,7 @@
         ${viewBtn(b)}
         <button class="btn-accept" data-action="accept" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-check-lg"></i> Accept</button>
         <button class="btn-decline" data-action="decline" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-x-lg"></i> Decline</button>
+      
       `)).join('');
     }
 
@@ -259,7 +272,7 @@
       }
       declinedBody.innerHTML = rows.map((b) => tableRow(b, `
         ${viewBtn(b)}
-        <button class="btn-restore" data-action="accept" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-arrow-counterclockwise"></i> Restore</button>
+        <button class="btn-restore" data-action="restore" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-arrow-counterclockwise"></i> Restore</button>
       `)).join('');
     }
 
@@ -286,7 +299,7 @@
         const dateLabel = dates.formatLong(b.event_date) || 'TBD';
         const status = b.status || 'accepted';
         const actions = status === 'completed'
-          ? `${viewBtn(b)}<button class="btn-restore" data-action="accept" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-arrow-counterclockwise"></i> Reopen</button>`
+          ? `${viewBtn(b)}<button class="btn-restore" data-action="restore" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-arrow-counterclockwise"></i> Reopen</button>`
           : `${viewBtn(b)}
              <button class="btn-complete" data-action="complete" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-check2-circle"></i> Mark completed</button>
              <button class="btn-cancel-event" data-action="cancel" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-slash-circle"></i> Cancel</button>`;
@@ -348,6 +361,165 @@
       updateStatus(id, 'declined', reason);
     }
 
+    // ---------- Accept modal (with email) ----------
+    function formatPHP(amount) {
+      if (amount == null || Number.isNaN(Number(amount))) return '';
+      return `\u20B1${Number(amount).toLocaleString('en-PH', {
+        minimumFractionDigits: 2, maximumFractionDigits: 2,
+      })}`;
+    }
+
+    function updateDownpaymentPreview() {
+      if (!acceptDownpaymentPreview) return;
+      const raw = parseFloat(acceptTotalInput && acceptTotalInput.value);
+      if (!isNaN(raw) && raw > 0) {
+        const dp = raw * 0.5;
+        acceptDownpaymentPreview.textContent = `Downpayment shown to client: ${formatPHP(dp)} (50% of ${formatPHP(raw)})`;
+        acceptDownpaymentPreview.classList.add('is-active');
+      } else {
+        acceptDownpaymentPreview.textContent = 'Downpayment shown to client: 50% of the agreed total';
+        acceptDownpaymentPreview.classList.remove('is-active');
+      }
+    }
+
+    function setAcceptFeedback(kind, text) {
+      if (!acceptFeedback) return;
+      acceptFeedback.className = 'accept-feedback';
+      if (kind) acceptFeedback.classList.add(`is-${kind}`);
+      acceptFeedback.textContent = text || '';
+    }
+
+    function setAcceptConfirmLabel() {
+      if (!acceptConfirmLabel) return;
+      const sendEmail = acceptSendEmailToggle ? acceptSendEmailToggle.checked : true;
+      acceptConfirmLabel.textContent = sendEmail ? 'Accept & Send Email' : 'Accept (no email)';
+    }
+
+    function openAccept(booking) {
+      if (!acceptModal) {
+        // Fallback if markup somehow missing.
+        updateStatus(booking.id, 'accepted');
+        return;
+      }
+      currentAcceptId = booking.id;
+      const eventType = eventLabel(booking) || 'Event';
+      const eventDate = dates.formatLong(booking.event_date) || 'TBD';
+      if (acceptSummary) {
+        acceptSummary.innerHTML = `
+          <strong>${escapeHtml(booking.name) || 'Client'}</strong>
+          &middot; ${escapeHtml(eventType)}
+          &middot; ${escapeHtml(eventDate)}
+          <br>
+          <span class="accept-summary-email">${escapeHtml(booking.email) || 'no email'}</span>`;
+      }
+      if (acceptTotalInput) acceptTotalInput.value = '';
+      if (acceptNoteInput) acceptNoteInput.value = '';
+      if (acceptSendEmailToggle) acceptSendEmailToggle.checked = !!booking.email;
+      setAcceptFeedback(null, '');
+      updateDownpaymentPreview();
+      setAcceptConfirmLabel();
+      acceptModal.style.display = 'block';
+      setTimeout(() => acceptTotalInput && acceptTotalInput.focus(), 30);
+    }
+
+    function closeAccept() {
+      if (acceptModal) acceptModal.style.display = 'none';
+      currentAcceptId = null;
+      setAcceptFeedback(null, '');
+    }
+
+    async function sendAcceptanceEmail({ bookingId, totalPrice, note }) {
+      const auth = window.LP && window.LP.adminAuth;
+      const token = auth && auth.getToken ? auth.getToken() : '';
+      if (!token) {
+        return { ok: false, error: 'Admin token missing. Please sign out and sign back in.' };
+      }
+      try {
+        const res = await fetch('/api/send-acceptance-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            booking_id: bookingId,
+            total_price: totalPrice,
+            note: note,
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          return { ok: false, error: data.error || `Email API ${res.status}` };
+        }
+        return { ok: true, id: data.id, to: data.to };
+      } catch (err) {
+        return { ok: false, error: err.message || 'Network error' };
+      }
+    }
+
+    async function confirmAccept() {
+      if (!currentAcceptId) return;
+      const id = currentAcceptId;
+      const totalRaw = acceptTotalInput && acceptTotalInput.value;
+      const totalPrice = totalRaw && !isNaN(parseFloat(totalRaw)) ? parseFloat(totalRaw) : null;
+      const note = acceptNoteInput && acceptNoteInput.value.trim();
+      const sendEmail = acceptSendEmailToggle ? acceptSendEmailToggle.checked : true;
+
+      acceptConfirmBtn.disabled = true;
+      acceptCancelBtn && (acceptCancelBtn.disabled = true);
+      setAcceptFeedback('working', 'Updating booking…');
+
+      try {
+        const update = { status: 'accepted', decline_reason: null };
+        const { error } = await supabase
+          .from(tableName)
+          .update(update)
+          .eq('id', id);
+        if (error) throw error;
+
+        if (!sendEmail) {
+          setAcceptFeedback('success', 'Booking accepted. (Email skipped.)');
+          await loadBookings();
+          setTimeout(closeAccept, 700);
+          return;
+        }
+
+        setAcceptFeedback('working', 'Sending acceptance email…');
+        const result = await sendAcceptanceEmail({
+          bookingId: id,
+          totalPrice,
+          note: note || null,
+        });
+        if (result.ok) {
+          setAcceptFeedback('success', `Booking accepted and email sent to ${result.to}.`);
+          await loadBookings();
+          setTimeout(closeAccept, 1100);
+        } else {
+          // The DB update succeeded so the booking IS accepted; only the
+          // email failed. Keep the modal open and surface the reason so the
+          // admin can retry or notify the client manually.
+          setAcceptFeedback('error', `Booking accepted, but email failed: ${result.error}. You can retry or notify the client manually.`);
+          await loadBookings();
+        }
+      } catch (err) {
+        console.error('[admin] Accept failed:', err);
+        setAcceptFeedback('error', `Failed to accept booking: ${err.message || err}`);
+      } finally {
+        acceptConfirmBtn.disabled = false;
+        acceptCancelBtn && (acceptCancelBtn.disabled = false);
+      }
+    }
+
+    if (acceptTotalInput) {
+      acceptTotalInput.addEventListener('input', updateDownpaymentPreview);
+    }
+    if (acceptSendEmailToggle) {
+      acceptSendEmailToggle.addEventListener('change', setAcceptConfirmLabel);
+    }
+    if (acceptCancelBtn) acceptCancelBtn.addEventListener('click', closeAccept);
+    if (acceptCloseBtn) acceptCloseBtn.addEventListener('click', closeAccept);
+    if (acceptConfirmBtn) acceptConfirmBtn.addEventListener('click', confirmAccept);
+
     // Expose modal close handlers to inline onclick attributes (kept for compatibility).
     window.closeDeclineModal = closeDecline;
     window.confirmDecline = confirmDecline;
@@ -368,7 +540,8 @@
         if (!booking) return;
         switch (action) {
           case 'view': showDetails(booking); break;
-          case 'accept': updateStatus(booking.id, 'accepted'); break;
+          case 'accept': openAccept(booking); break;
+          case 'restore': updateStatus(booking.id, 'accepted'); break;
           case 'decline': openDecline(booking.id); break;
           case 'complete': updateStatus(booking.id, 'completed'); break;
           case 'cancel':
@@ -409,6 +582,7 @@
     window.addEventListener('click', (event) => {
       if (event.target === detailsModal) closeDetails();
       if (event.target === declineModal) closeDecline();
+      if (event.target === acceptModal) closeAccept();
     });
 
     // Sidebar nav

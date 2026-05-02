@@ -1,0 +1,13 @@
+{
+  "name": "loyal-production",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Loyal Production booking site (static + Vercel serverless email function)",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "resend": "^4.0.1"
+  }
+}
