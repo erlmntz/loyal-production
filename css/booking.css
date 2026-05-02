@@ -197,27 +197,186 @@
 /* Form feedback */
 .form-feedback {
     margin-top: 20px;
-    text-align: center;
     font-family: 'Montserrat', sans-serif;
     font-size: 15px;
-    padding: 10px;
-    border-radius: 8px;
+}
+
+.form-feedback:empty {
     display: none;
 }
 
-.form-feedback.success {
-    display: block;
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+.form-msg {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    text-align: center;
+    line-height: 1.5;
 }
 
-.form-feedback.error {
-    display: block;
+.form-msg h3 {
+    margin: 0 0 6px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+}
+
+.form-msg p {
+    margin: 4px 0;
+}
+
+.form-msg code {
+    background: rgba(0, 0, 0, 0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.form-msg-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: #c3e6cb;
+    text-align: left;
+}
+
+.form-msg-error {
     background-color: #f8d7da;
     color: #721c24;
-    border: 1px solid #f5c6cb;
+    border-color: #f5c6cb;
 }
+
+.form-msg-info {
+    background-color: #fff3cd;
+    color: #856404;
+    border-color: #ffeeba;
+}
+
+/* Invalid input highlight */
+.lp-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.15);
+}
+
+/* Inline form hint under fields */
+.form-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: #6c757d;
+}
+
+/* Auxiliary link below the form */
+.form-aux-link {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+}
+
+.form-aux-link a {
+    color: #b89b5e;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.form-aux-link a:hover {
+    text-decoration: underline;
+}
+
+/* Flatpickr booked-day styling */
+.flatpickr-day.lp-booked,
+.flatpickr-day.flatpickr-disabled.lp-booked {
+    background: #fdecec !important;
+    color: #c0392b !important;
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+
+/* Status lookup page */
+.status-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+    color: #2c2c2c;
+}
+
+.status-subtitle {
+    color: #555;
+    margin-bottom: 18px;
+    font-size: 14.5px;
+}
+
+.status-results {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.status-results:empty {
+    display: none;
+}
+
+.status-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.status-card header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+}
+
+.status-card header h3 {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    color: #2c2c2c;
+}
+
+.status-card p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #444;
+}
+
+.status-meta {
+    color: #888 !important;
+    font-size: 12.5px !important;
+}
+
+.status-reason {
+    background: #fff7e6;
+    border-left: 3px solid #f0ad4e;
+    padding: 8px 10px;
+    border-radius: 4px;
+    color: #6b4f10 !important;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    background: #e0e0e0;
+    color: #333;
+    white-space: nowrap;
+}
+
+.status-badge.status-pending { background: #fff3cd; color: #856404; }
+.status-badge.status-accepted { background: #d4edda; color: #155724; }
+.status-badge.status-declined { background: #f8d7da; color: #721c24; }
+.status-badge.status-completed { background: #cce5ff; color: #004085; }
+.status-badge.status-cancelled { background: #e2e3e5; color: #383d41; }
 
 /* Back button */
 .back-btn {

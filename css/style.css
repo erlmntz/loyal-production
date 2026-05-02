@@ -148,13 +148,15 @@ header h1 {
 }
 
 .banner-buttons .book-now-btn,
-.banner-buttons .schedule-meeting-btn {
+.banner-buttons .schedule-meeting-btn,
+.banner-buttons .booking-status-btn {
   width: 100%;
   text-align: center;
 }
 
 .book-now-btn,
-.schedule-meeting-btn {
+.schedule-meeting-btn,
+.booking-status-btn {
   padding: 14px 20px;
   font-size: 18px;
   text-decoration: none;
@@ -197,8 +199,9 @@ header h1 {
   100% { box-shadow: 0 0 5px rgba(156, 136, 77, 0.3); }
 }
 
-/* ===== Schedule Meeting Button ===== */
-.schedule-meeting-btn {
+/* ===== Schedule Meeting + Booking Status Buttons (shared style) ===== */
+.schedule-meeting-btn,
+.booking-status-btn {
   background-color: rgb(156, 136, 77);
   color: #000;
   border: 2px solid rgb(156, 136, 77);
@@ -219,11 +222,13 @@ header h1 {
   animation: soft-pulse 2s ease-in-out infinite;
 }
 
-.schedule-meeting-btn i {
+.schedule-meeting-btn i,
+.booking-status-btn i {
   font-size: 20px;
 }
 
-.schedule-meeting-btn:hover {
+.schedule-meeting-btn:hover,
+.booking-status-btn:hover {
   background-color: transparent;
   color: rgb(156, 136, 77);
   transform: translateY(-3px);
@@ -570,7 +575,8 @@ footer p {
   }
 
   .banner-buttons .book-now-btn,
-  .banner-buttons .schedule-meeting-btn {
+  .banner-buttons .schedule-meeting-btn,
+  .banner-buttons .booking-status-btn {
     padding: 12px 20px;
     font-size: 16px;
   }
@@ -661,7 +667,8 @@ footer p {
   }
 
   .banner-buttons .book-now-btn,
-  .banner-buttons .schedule-meeting-btn {
+  .banner-buttons .schedule-meeting-btn,
+  .banner-buttons .booking-status-btn {
     font-size: 14px;
     padding: 10px 15px;
   }
@@ -712,12 +719,15 @@ footer p {
   }
 
   .banner-buttons .book-now-btn,
-  .banner-buttons .schedule-meeting-btn {
+  .banner-buttons .schedule-meeting-btn,
+  .banner-buttons .booking-status-btn {
     font-size: 12px;
     padding: 8px 12px;
   }
 
-  .schedule-meeting-btn i {
+  .schedule-meeting-btn i,
+  .booking-status-btn i {
     font-size: 14px;
   }
 }
+

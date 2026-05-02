@@ -5,41 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loyal Production – Book Now</title>
   <link rel="icon" type="image/png" href="images/LP_logo.jpg">
-  
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
-  
+
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  
+
   <!-- Flatpickr CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  
-  <!-- Custom CSS (optional, include if you have them) -->
+
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/booking.css">
 </head>
 <body>
   <header>
-    <img src="images/LP_logonobg.png" alt="Loyal Production Logo" width="200">
+    <a href="index.html" aria-label="Loyal Production - Home">
+      <img src="images/LP_logonobg.png" alt="Loyal Production Logo" width="200">
+    </a>
     <h1>Loyal Production</h1>
   </header>
 
   <section class="booking-section">
     <div class="container">
       <div class="booking-form-container">
-        
+
         <!-- Back Button -->
-        <button class="back-btn" onclick="history.back()">
+        <button type="button" class="back-btn" onclick="history.back()">
           <i class="bi bi-arrow-left-short"></i> Back
         </button>
 
         <!-- Booking Form -->
         <form id="booking-form">
-          
+
           <!-- Event Type -->
           <div class="form-group">
             <label for="event-type">Event Type <span class="required">*</span></label>
@@ -63,6 +65,7 @@
           <div class="form-group">
             <label for="event-date">Preferred Event Date <span class="required">*</span></label>
             <input type="text" id="event-date" name="eventDate" placeholder="Click to select a date" required>
+            <small class="form-hint">Already-booked dates are greyed out and cannot be selected.</small>
           </div>
 
           <!-- Service Type -->
@@ -109,12 +112,15 @@
             <textarea id="message" name="message" rows="4" placeholder="Tell us more about your event..."></textarea>
           </div>
 
-          <!-- Submit Button -->
           <button type="submit" class="btn btn-primary submit-btn">Send Booking Request</button>
         </form>
 
-        <!-- Form Feedback -->  
-        <div id="form-feedback" class="form-feedback"></div>
+        <!-- Form Feedback -->
+        <div id="form-feedback" class="form-feedback" aria-live="polite"></div>
+
+        <p class="form-aux-link">
+          Already booked? <a href="status.html">Track your booking status</a>.
+        </p>
       </div>
     </div>
   </section>
@@ -123,142 +129,12 @@
     <p>&copy; 2026 Loyal Production. All rights reserved.</p>
   </footer>
 
-  <!-- ================= LOAD LIBRARIES (CORRECT ORDER) ================= -->
-  <!-- Flatpickr -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <!-- Supabase (MUST come before our custom script) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <!-- ================= CUSTOM SCRIPT (INLINE FOR RELIABILITY) ================= -->
-  <script>
-    // Ensure DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('DOM ready – starting script');
-
-      // ----- SUPABASE INITIALIZATION -----
-      if (typeof window.supabase === 'undefined') {
-        console.error('Supabase library not loaded!');
-        document.getElementById('form-feedback').innerHTML =
-          '<p style="color:red;">Error: Booking system unavailable. Please refresh or try again later.</p>';
-        return;
-      }
-
-      const supabaseUrl = 'https://wxiwknkeqgptjlhfcwnt.supabase.co';
-      const supabaseKey = 'sb_publishable_-QVYmHFZsMHzS7RjAUh5Zg_xtPsHoZg';
-      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-      console.log('Supabase initialized');
-
-      // ----- FLATPICKR INITIALIZATION -----
-      const dateInput = document.getElementById('event-date');
-      if (dateInput && typeof flatpickr !== 'undefined') {
-        flatpickr(dateInput, {
-          enableTime: false,
-          dateFormat: "F j, Y",
-          minDate: "today",
-          disableMobile: true,
-          allowInput: true,
-          ariaDateFormat: "F j, Y",
-        });
-        console.log('Flatpickr initialized');
-      } else {
-        console.error('Flatpickr not loaded or input missing');
-      }
-
-      // ----- TOGGLE "OTHER" EVENT TYPE -----
-      window.toggleOtherEventType = function(selectElement) {
-        const otherInput = document.getElementById('other-event-type');
-        if (selectElement.value === 'other') {
-          otherInput.style.display = 'block';
-          otherInput.setAttribute('required', 'required');
-        } else {
-          otherInput.style.display = 'none';
-          otherInput.removeAttribute('required');
-        }
-      };
-
-      // ----- FORM SUBMISSION HANDLER -----
-      const bookingForm = document.getElementById('booking-form');
-      const feedbackDiv = document.getElementById('form-feedback');
-
-      if (!bookingForm) {
-        console.error('Booking form not found!');
-        return;
-      }
-
-      bookingForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        console.log('Form submitted – starting validation');
-
-        // Simple client-side validation
-        const requiredFields = bookingForm.querySelectorAll('[required]');
-        let allValid = true;
-        requiredFields.forEach(field => {
-          if (!field.value.trim()) {
-            field.style.borderColor = 'red';
-            allValid = false;
-          } else {
-            field.style.borderColor = '';
-          }
-        });
-
-        if (!allValid) {
-          feedbackDiv.innerHTML = '<p style="color:red;">Please fill all required fields.</p>';
-          console.log('Validation failed');
-          return;
-        }
-
-        // Collect form data
-        const formData = new FormData(bookingForm);
-        const rawData = Object.fromEntries(formData.entries());
-        console.log('Form data collected:', rawData);
-
-        // Build insert object
-        const insertData = {
-          event_type: rawData.eventType,
-          venue: rawData.venue || null,
-          event_date: rawData.eventDate,
-          service_type: rawData.serviceType,
-          name: rawData.name,
-          email: rawData.email,
-          phone: rawData.phone,
-          message: rawData.message || null,
-          created_at: new Date().toISOString()
-        };
-
-        if (rawData.eventType === 'other') {
-          insertData.other_event_type = rawData.otherEventType;
-        } else {
-          insertData.other_event_type = null;
-        }
-
-        console.log('Data to insert:', insertData);
-        feedbackDiv.innerHTML = '<p style="color:green;">Sending booking request...</p>';
-
-        try {
-          const { data, error } = await supabase
-            .from('bookings')
-            .insert([insertData]);
-
-          if (error) {
-            console.error('Supabase insert error:', error);
-            feedbackDiv.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
-          } else {
-            console.log('Insert successful:', data);
-            feedbackDiv.innerHTML = '<p style="color:green;">Booking request sent successfully!</p>';
-            bookingForm.reset();
-            const otherInput = document.getElementById('other-event-type');
-            otherInput.style.display = 'none';
-            otherInput.removeAttribute('required');
-          }
-        } catch (err) {
-          console.error('Network or unexpected error:', err);
-          feedbackDiv.innerHTML = '<p style="color:red;">Network error. Please check console and try again.</p>';
-        }
-      });
-
-      console.log('Event listener attached – ready for submissions');
-    });
-  </script>
-  <!-- ================= END CUSTOM SCRIPT ================= -->
+  <script src="js/lib/supabase-client.js"></script>
+  <script src="js/lib/date-utils.js"></script>
+  <script src="js/lib/escape.js"></script>
+  <script src="js/user/booking.js"></script>
 </body>
 </html>

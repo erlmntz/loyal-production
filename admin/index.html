@@ -4,81 +4,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Loyal Production – Admin Dashboard</title>
-  <link rel="icon" type="image/png" href="images/LP_logo.jpg">
-  
+  <link rel="icon" type="image/png" href="/images/LP_logo.jpg">
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-  
+
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  
+
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="css/style.css">
-  <!-- Override to show all stat cards -->
-  <style>
-    .stat-card:not(:first-child) {
-      display: flex !important;
-    }
-    /* Decline modal specific */
-    #declineReasonModal .modal-content {
-      max-width: 400px;
-    }
-    #declineReasonModal textarea {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-family: inherit;
-      resize: vertical;
-    }
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .btn-confirm {
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .btn-cancel {
-      background: #6c757d;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="/admin/css/style.css">
 </head>
-<body>
+<body data-locked="true">
+  <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle navigation">
+    <i class="bi bi-list"></i>
+  </button>
+
   <div class="dashboard-container">
     <aside class="sidebar">
       <div class="sidebar-header">
-        <img src="images/LP_logonobg.png" alt="Loyal Production" class="logo">
+        <img src="/images/LP_logonobg.png" alt="Loyal Production" class="logo">
         <h2>Loyal Production</h2>
+        <p class="sidebar-tag">Admin</p>
       </div>
       <nav class="sidebar-nav">
         <ul>
-          <li class="active" data-section="dashboard"><i class="bi bi-speedometer2"></i> Dashboard</li>
-          <li data-section="booking"><i class="bi bi-calendar-check"></i> Request Booking</li>
-          <li data-section="accepted"><i class="bi bi-check-circle"></i> Accepted Booking</li>
-          <li data-section="event"><i class="bi bi-mic"></i> Event</li>
+          <li class="active" data-section="dashboard"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></li>
+          <li data-section="booking"><i class="bi bi-calendar-check"></i> <span>Request Booking</span></li>
+          <li data-section="accepted"><i class="bi bi-check-circle"></i> <span>Accepted Booking</span></li>
+          <li data-section="declined"><i class="bi bi-x-circle"></i> <span>Declined</span></li>
+          <li data-section="event"><i class="bi bi-mic"></i> <span>Event</span></li>
         </ul>
       </nav>
       <div class="sidebar-footer">
-        <p>© 2026 Loyal Prod.</p>
+        <button type="button" class="sidebar-lock" id="admin-lock-btn">
+          <i class="bi bi-box-arrow-left"></i>
+          <span>Sign out</span>
+        </button>
+        <p class="sidebar-copy">&copy; 2026 Loyal Prod.</p>
       </div>
     </aside>
 
     <main class="main-content">
-      <!-- Dashboard Section -->
+      <!-- Dashboard -->
       <section id="dashboard-section" class="content-section active">
         <h1>Dashboard</h1>
         <div class="stats-grid">
@@ -99,26 +69,25 @@
           <div class="stat-card">
             <i class="bi bi-calendar-week"></i>
             <div>
-              <h3>Incoming This Week</h3>
+              <h3>Next 7 days</h3>
               <p id="incoming-week-count">0</p>
             </div>
           </div>
           <div class="stat-card">
             <i class="bi bi-calendar-month"></i>
             <div>
-              <h3>Incoming This Month</h3>
+              <h3>Next 30 days</h3>
               <p id="incoming-month-count">0</p>
             </div>
           </div>
           <div class="stat-card">
-            <i class="bi bi-calendar-year"></i>
+            <i class="bi bi-calendar-range"></i>
             <div>
-              <h3>Incoming This Year</h3>
+              <h3>Next 365 days</h3>
               <p id="incoming-year-count">0</p>
             </div>
           </div>
         </div>
-        <!-- Recent Bookings Preview -->
         <div class="recent-preview">
           <h2>Recent Bookings</h2>
           <table class="bookings-table" id="recent-bookings">
@@ -130,11 +99,14 @@
         </div>
       </section>
 
-      <!-- Request Booking Section -->
+      <!-- Request Booking -->
       <section id="booking-section" class="content-section">
         <div class="section-header">
           <h1>Booking Requests</h1>
-          <button class="btn-refresh" id="refresh-bookings"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+          <div class="section-tools">
+            <input type="search" class="search-input" id="search-bookings" placeholder="Search name, email, event...">
+            <button class="btn-refresh" id="refresh-bookings"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+          </div>
         </div>
         <div class="table-responsive">
           <table class="bookings-table" id="bookings-table">
@@ -155,11 +127,14 @@
         </div>
       </section>
 
-      <!-- Accepted Booking Section -->
+      <!-- Accepted -->
       <section id="accepted-section" class="content-section">
         <div class="section-header">
           <h1>Accepted Bookings</h1>
-          <button class="btn-refresh" id="refresh-accepted"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+          <div class="section-tools">
+            <input type="search" class="search-input" id="search-accepted" placeholder="Search...">
+            <button class="btn-refresh" id="refresh-accepted"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+          </div>
         </div>
         <div class="table-responsive">
           <table class="bookings-table" id="accepted-table">
@@ -180,28 +155,128 @@
         </div>
       </section>
 
-      <!-- Event Section (Placeholder) -->
+      <!-- Declined -->
+      <section id="declined-section" class="content-section">
+        <div class="section-header">
+          <h1>Declined Bookings</h1>
+          <div class="section-tools">
+            <input type="search" class="search-input" id="search-declined" placeholder="Search...">
+            <button class="btn-refresh" id="refresh-declined"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="bookings-table" id="declined-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Event Type</th>
+                <th>Service</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="declined-body">
+              <tr><td colspan="6">Loading declined bookings...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Event Management -->
       <section id="event-section" class="content-section">
-        <h1>Event Management</h1>
-        <p>Event planning and management tools will appear here.</p>
+        <div class="section-header">
+          <h1>Event Management</h1>
+          <div class="section-tools">
+            <input type="search" class="search-input" id="search-event" placeholder="Search...">
+            <button class="btn-refresh" id="refresh-event"><i class="bi bi-arrow-repeat"></i> Refresh</button>
+          </div>
+        </div>
+        <p class="section-hint">Upcoming and past accepted events. Mark as completed once finished, or cancel if it cannot proceed.</p>
+        <div class="table-responsive">
+          <table class="bookings-table" id="event-table">
+            <thead>
+              <tr>
+                <th>Event Date</th>
+                <th>Client</th>
+                <th>Event Type</th>
+                <th>Service</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="event-body">
+              <tr><td colspan="6">Loading events...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </section>
     </main>
   </div>
 
-  <!-- Modal for Booking Details -->
+  <!-- Booking Details Modal -->
   <div id="bookingModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h2>Booking Details</h2>
         <span class="close-modal">&times;</span>
       </div>
-      <div id="modal-body">
-        <!-- Details will be injected here -->
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Accept Booking Modal -->
+  <div id="acceptModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Accept Booking</h2>
+        <span class="close-modal" id="acceptModalClose">&times;</span>
+      </div>
+      <div>
+        <p id="accept-summary" class="accept-summary"></p>
+        <label class="accept-field-label" for="accept-total">
+          Quoted total price (optional)
+          <span class="accept-field-hint">Leave blank to send "50% of the agreed total" without an amount.</span>
+        </label>
+        <div class="accept-input-wrap">
+          <span class="accept-input-prefix">₱</span>
+          <input
+            type="number"
+            id="accept-total"
+            min="0"
+            step="0.01"
+            placeholder="e.g. 15000" />
+        </div>
+        <p id="accept-downpayment-preview" class="accept-downpayment"></p>
+
+        <label class="accept-field-label" for="accept-note">
+          Optional note to client
+          <span class="accept-field-hint">Will appear in a highlighted block in the email.</span>
+        </label>
+        <textarea
+          id="accept-note"
+          rows="3"
+          placeholder="e.g. We'll confirm your shoot start time once payment is received."></textarea>
+
+        <label class="accept-checkbox">
+          <input type="checkbox" id="accept-send-email" checked>
+          <span>Send acceptance email with downpayment instructions</span>
+        </label>
+
+        <p id="accept-feedback" class="accept-feedback" role="status" aria-live="polite"></p>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="acceptModalCancel">Cancel</button>
+          <button type="button" class="btn-confirm" id="acceptModalConfirm">
+            <i class="bi bi-check2-circle"></i>
+            <span id="acceptModalConfirmLabel">Accept &amp; Send Email</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal for Decline Reason -->
+  <!-- Decline Reason Modal -->
   <div id="declineReasonModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -219,385 +294,12 @@
     </div>
   </div>
 
-  <!-- Supabase JS -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // ---------- Supabase Init ----------
-      const supabaseUrl = 'https://wxiwknkeqgptjlhfcwnt.supabase.co';
-      const supabaseKey = 'sb_publishable_-QVYmHFZsMHzS7RjAUh5Zg_xtPsHoZg'; // Your working key
-      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-      // ---------- DOM Elements ----------
-      const navItems = document.querySelectorAll('.sidebar-nav li');
-      const sections = document.querySelectorAll('.content-section');
-      
-      // Request Booking elements
-      const bookingsBody = document.getElementById('bookings-body');
-      const refreshBtn = document.getElementById('refresh-bookings');
-      
-      // Accepted Booking elements
-      const acceptedBody = document.getElementById('accepted-body');
-      const refreshAccepted = document.getElementById('refresh-accepted');
-      
-      // Shared elements
-      const recentBody = document.querySelector('#recent-bookings tbody');
-      
-      // Stat elements
-      const requestCountEl = document.getElementById('request-booking-count');
-      const acceptedCountEl = document.getElementById('accepted-booking-count');
-      const weekCountEl = document.getElementById('incoming-week-count');
-      const monthCountEl = document.getElementById('incoming-month-count');
-      const yearCountEl = document.getElementById('incoming-year-count');
-      
-      // Modal elements
-      const modal = document.getElementById('bookingModal');
-      const modalBody = document.getElementById('modal-body');
-      const closeModal = document.querySelector('#bookingModal .close-modal');
-
-      // Decline modal elements
-      const declineModal = document.getElementById('declineReasonModal');
-      const declineReasonInput = document.getElementById('declineReason');
-      let currentDeclineBookingId = null;
-
-      // Close booking details modal when clicking X or outside
-      closeModal.onclick = () => modal.style.display = 'none';
-      window.onclick = (event) => {
-        if (event.target == modal) modal.style.display = 'none';
-        if (event.target == declineModal) closeDeclineModal();
-      };
-
-      // Function to close decline modal and reset
-      window.closeDeclineModal = function() {
-        declineModal.style.display = 'none';
-        declineReasonInput.value = '';
-        currentDeclineBookingId = null;
-      };
-
-      // Function to open decline modal with booking ID
-      window.openDeclineModal = function(bookingId) {
-        currentDeclineBookingId = bookingId;
-        declineModal.style.display = 'block';
-      };
-
-      // Function to confirm decline
-      window.confirmDecline = async function() {
-        const reason = declineReasonInput.value.trim();
-        if (!reason) {
-          alert('Please enter a decline reason.');
-          return;
-        }
-        if (!currentDeclineBookingId) return;
-
-        // Call update function with status and reason
-        await updateBookingStatus(currentDeclineBookingId, 'declined', reason);
-        closeDeclineModal();
-      };
-
-      // Navigation
-      navItems.forEach(item => {
-        item.addEventListener('click', function() {
-          navItems.forEach(nav => nav.classList.remove('active'));
-          this.classList.add('active');
-          const sectionId = this.dataset.section;
-          sections.forEach(sec => sec.classList.remove('active'));
-          document.getElementById(sectionId + '-section').classList.add('active');
-          
-          // Load appropriate data when switching to that section
-          if (sectionId === 'booking' || sectionId === 'dashboard') {
-            loadBookings();
-          } else if (sectionId === 'accepted') {
-            loadAcceptedBookings();
-          }
-        });
-      });
-
-      // ---------- Helper: Parse event_date string to Date ----------
-      function parseEventDate(dateStr) {
-        if (!dateStr) return null;
-        // Expected format: "March 11, 2026"
-        const parsed = new Date(dateStr);
-        return isNaN(parsed.getTime()) ? null : parsed;
-      }
-
-      // ---------- Update Dashboard Stats ----------
-      function updateDashboardStats(bookings) {
-        // Count request (pending) and accepted
-        const requestBookings = bookings.filter(b => !b.status || b.status === 'pending');
-        const acceptedBookings = bookings.filter(b => b.status === 'accepted');
-        
-        requestCountEl.textContent = requestBookings.length;
-        acceptedCountEl.textContent = acceptedBookings.length;
-
-        // Get today's date at midnight
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        // Calculate end dates
-        const weekEnd = new Date(today);
-        weekEnd.setDate(today.getDate() + 7);
-        
-        const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-        
-        const yearEnd = new Date(today.getFullYear() + 1, 0, 1);
-
-        // Count incoming events among accepted bookings
-        let weekCount = 0, monthCount = 0, yearCount = 0;
-        
-        acceptedBookings.forEach(b => {
-          const eventDate = parseEventDate(b.event_date);
-          if (!eventDate) return;
-          
-          // Only consider future events
-          if (eventDate >= today) {
-            if (eventDate < weekEnd) weekCount++;
-            if (eventDate < monthEnd) monthCount++;
-            if (eventDate < yearEnd) yearCount++;
-          }
-        });
-        
-        weekCountEl.textContent = weekCount;
-        monthCountEl.textContent = monthCount;
-        yearCountEl.textContent = yearCount;
-      }
-
-      // ---------- Update Booking Status (with optional reason) ----------
-      async function updateBookingStatus(bookingId, newStatus, reason = null) {
-        try {
-          const updateData = { status: newStatus };
-          if (reason) {
-            updateData.decline_reason = reason;
-          }
-
-          const { error } = await supabase
-            .from('bookings')
-            .update(updateData)
-            .eq('id', bookingId);
-
-          if (error) {
-            // Check if the error is about missing decline_reason column
-            if (reason && error.message && error.message.includes('decline_reason')) {
-              throw new Error('The "decline_reason" column is missing. Please run this SQL in your Supabase SQL Editor: ALTER TABLE bookings ADD COLUMN decline_reason text;');
-            }
-            throw error;
-          }
-
-          // Reload the currently active section
-          const activeSection = document.querySelector('.content-section.active').id;
-          if (activeSection === 'booking-section' || activeSection === 'dashboard-section') {
-            loadBookings();
-          } else if (activeSection === 'accepted-section') {
-            loadAcceptedBookings();
-          }
-        } catch (err) {
-          console.error('Error updating status:', err);
-          alert('Failed to update status: ' + err.message);
-        }
-      }
-
-      // ---------- Show Modal with Booking Details (ID removed) ----------
-      function showBookingDetails(booking) {
-        const eventType = booking.event_type === 'other' ? booking.other_event_type : booking.event_type;
-        const status = booking.status || 'pending';
-        const formattedDate = new Date(booking.created_at).toLocaleString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-
-        modalBody.innerHTML = `
-          <div class="booking-detail"><span class="detail-label">Name:</span> <span class="detail-value">${booking.name || 'N/A'}</span></div>
-          <div class="booking-detail"><span class="detail-label">Email:</span> <span class="detail-value">${booking.email || 'N/A'}</span></div>
-          <div class="booking-detail"><span class="detail-label">Phone:</span> <span class="detail-value">${booking.phone || 'N/A'}</span></div>
-          <div class="booking-detail"><span class="detail-label">Event Type:</span> <span class="detail-value">${eventType || 'N/A'}</span></div>
-          <div class="booking-detail"><span class="detail-label">Event Date:</span> <span class="detail-value">${booking.event_date || 'N/A'}</span></div>
-          <div class="booking-detail"><span class="detail-label">Venue:</span> <span class="detail-value">${booking.venue || 'N/A'}</span></div>
-          <div class="booking-detail"><span class="detail-label">Service:</span> <span class="detail-value">${booking.service_type || 'N/A'}</span></div>
-          <div class="booking-detail"><span class="detail-label">Message:</span> <span class="detail-value">${booking.message || '—'}</span></div>
-          <div class="booking-detail"><span class="detail-label">Status:</span> <span class="detail-value"><span class="status-badge status-${status}">${status}</span></span></div>
-          <div class="booking-detail"><span class="detail-label">Submitted:</span> <span class="detail-value">${formattedDate}</span></div>
-        `;
-        modal.style.display = 'block';
-      }
-
-      // ---------- Load All Bookings (for Request Booking and Dashboard) ----------
-      async function loadBookings() {
-        try {
-          const { data, error } = await supabase
-            .from('bookings')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-          if (error) {
-            if (error.code === '42501' || error.message.includes('permission denied')) {
-              throw new Error('Permission denied: RLS is blocking SELECT. Add a SELECT policy for anon users.');
-            }
-            throw error;
-          }
-
-          renderBookingsTable(data, bookingsBody);
-          renderRecentPreview(data);
-          updateDashboardStats(data); // Update stats on dashboard
-        } catch (err) {
-          console.error('Error loading bookings:', err);
-          bookingsBody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">❌ ${err.message}</td></tr>`;
-          if (recentBody) recentBody.innerHTML = '';
-          // Reset stats to 0
-          requestCountEl.textContent = '0';
-          acceptedCountEl.textContent = '0';
-          weekCountEl.textContent = '0';
-          monthCountEl.textContent = '0';
-          yearCountEl.textContent = '0';
-        }
-      }
-
-      // ---------- Load Accepted Bookings ----------
-      async function loadAcceptedBookings() {
-        try {
-          const { data, error } = await supabase
-            .from('bookings')
-            .select('*')
-            .eq('status', 'accepted')
-            .order('created_at', { ascending: false });
-
-          if (error) {
-            if (error.code === '42501' || error.message.includes('permission denied')) {
-              throw new Error('Permission denied: RLS is blocking SELECT. Add a SELECT policy for anon users.');
-            }
-            throw error;
-          }
-
-          renderAcceptedTable(data);
-        } catch (err) {
-          console.error('Error loading accepted bookings:', err);
-          acceptedBody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">❌ ${err.message}</td></tr>`;
-        }
-      }
-
-      // Render table for Request Booking (only pending bookings)
-      function renderBookingsTable(bookings, tbody) {
-        // Filter to only pending (or null) bookings
-        const pendingBookings = bookings.filter(b => !b.status || b.status === 'pending');
-        
-        if (!pendingBookings.length) {
-          tbody.innerHTML = '<tr><td colspan="6">No pending bookings found.</td></tr>';
-          return;
-        }
-
-        let html = '';
-        pendingBookings.forEach(b => {
-          const eventType = b.event_type === 'other' ? b.other_event_type : b.event_type;
-          const status = b.status || 'pending';
-          
-          // Format timestamp
-          const timestamp = b.created_at ? new Date(b.created_at).toLocaleString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          }) : 'N/A';
-
-          html += `
-            <tr>
-              <td>${timestamp}</td>
-              <td>${b.name || 'N/A'}</td>
-              <td>${b.email || 'N/A'}</td>
-              <td>${eventType || 'N/A'}</td>
-              <td>${b.service_type || 'N/A'}</td>
-              <td>
-                <button class="action-btn btn-view" onclick='showBookingDetails(${JSON.stringify(b).replace(/'/g, "\\'")})'>
-                  <i class="bi bi-eye"></i> View
-                </button>
-                <button class="action-btn btn-accept" 
-                  onclick="updateBookingStatus(${b.id}, 'accepted')"
-                  ${status !== 'pending' ? 'disabled' : ''}>
-                  Accept
-                </button>
-                <button class="action-btn btn-decline" 
-                  onclick="openDeclineModal(${b.id})"
-                  ${status !== 'pending' ? 'disabled' : ''}>
-                  Decline
-                </button>
-              </td>
-            </tr>
-          `;
-        });
-        tbody.innerHTML = html;
-      }
-
-      // Render table for Accepted Bookings (View button only)
-      function renderAcceptedTable(bookings) {
-        if (!bookings.length) {
-          acceptedBody.innerHTML = '<tr><td colspan="6">No accepted bookings found.</td></tr>';
-          return;
-        }
-
-        let html = '';
-        bookings.forEach(b => {
-          const eventType = b.event_type === 'other' ? b.other_event_type : b.event_type;
-          
-          // Format timestamp
-          const timestamp = b.created_at ? new Date(b.created_at).toLocaleString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          }) : 'N/A';
-
-          html += `
-            <tr>
-              <td>${timestamp}</td>
-              <td>${b.name || 'N/A'}</td>
-              <td>${b.email || 'N/A'}</td>
-              <td>${eventType || 'N/A'}</td>
-              <td>${b.service_type || 'N/A'}</td>
-              <td>
-                <button class="action-btn btn-view" onclick='showBookingDetails(${JSON.stringify(b).replace(/'/g, "\\'")})'>
-                  <i class="bi bi-eye"></i> View
-                </button>
-              </td>
-            </tr>
-          `;
-        });
-        acceptedBody.innerHTML = html;
-      }
-
-      function renderRecentPreview(bookings) {
-        const recent = bookings.slice(0, 5);
-        let html = '';
-        recent.forEach(b => {
-          const eventType = b.event_type === 'other' ? b.other_event_type : b.event_type;
-          html += `
-            <tr>
-              <td>${b.name || 'N/A'}</td>
-              <td>${eventType || 'N/A'}</td>
-              <td>${b.event_date || 'N/A'}</td>
-            </tr>
-          `;
-        });
-        if (recentBody) recentBody.innerHTML = html;
-      }
-
-      // Make functions globally accessible
-      window.updateBookingStatus = updateBookingStatus;
-      window.showBookingDetails = showBookingDetails;
-
-      // Refresh buttons
-      if (refreshBtn) {
-        refreshBtn.addEventListener('click', loadBookings);
-      }
-      if (refreshAccepted) {
-        refreshAccepted.addEventListener('click', loadAcceptedBookings);
-      }
-
-      // Initial load (dashboard shows all bookings)
-      loadBookings();
-    });
-  </script>
+  <script src="/js/lib/supabase-client.js"></script>
+  <script src="/js/lib/date-utils.js"></script>
+  <script src="/js/lib/escape.js"></script>
+  <script src="/admin/js/auth.js"></script>
+  <script src="/admin/js/admin.js"></script>
 </body>
 </html>

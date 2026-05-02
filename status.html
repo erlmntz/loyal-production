@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Status · Loyal Production</title>
+  <link rel="icon" type="image/png" href="images/LP_logo.jpg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/booking.css">
+</head>
+<body>
+  <header>
+    <a href="index.html" aria-label="Loyal Production - Home">
+      <img src="images/LP_logonobg.png" alt="Loyal Production Logo" width="200">
+    </a>
+    <h1>Loyal Production</h1>
+  </header>
+
+  <section class="booking-section">
+    <div class="container">
+      <div class="booking-form-container">
+        <button type="button" class="back-btn" onclick="history.back()">
+          <i class="bi bi-arrow-left-short"></i> Back
+        </button>
+
+        <h2 class="status-title">Track your booking</h2>
+        <p class="status-subtitle">Enter the email you used when booking to see the status of your request(s).</p>
+
+        <form id="lookup-form">
+          <div class="form-group">
+            <label for="lookup-email">Email Address <span class="required">*</span></label>
+            <input type="email" id="lookup-email" name="email" placeholder="you@example.com" required>
+          </div>
+          <button type="submit" class="btn btn-primary submit-btn">Look up bookings</button>
+        </form>
+
+        <div id="lookup-results" class="status-results" aria-live="polite"></div>
+
+        <p class="form-aux-link">
+          Need to book a new event? <a href="booking.html">Go to booking form</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 Loyal Production. All rights reserved.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/lib/supabase-client.js"></script>
+  <script src="js/lib/date-utils.js"></script>
+  <script src="js/lib/escape.js"></script>
+  <script src="js/user/status.js"></script>
+</body>
+</html>

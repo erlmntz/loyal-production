@@ -1,0 +1,650 @@
+/**
+ * Loyal Production - Admin dashboard
+ *
+ * Loads all bookings from Supabase once, then renders four views:
+ *   - Dashboard      : stat cards + recent-bookings preview
+ *   - Request booking: pending requests with Accept / Decline actions
+ *   - Accepted       : confirmed bookings (View)
+ *   - Declined       : declined requests with reason (Restore option)
+ *   - Event          : upcoming accepted events with "Mark completed" / "Cancel"
+ *
+ * Subscribes to Supabase realtime so changes from the user side
+ * (or other admin tabs) refresh the views automatically.
+ */
+(function () {
+  'use strict';
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const supabase = window.LP && window.LP.supabase;
+    const dates = window.LP && window.LP.dates;
+    const tableName = (window.LP && window.LP.bookingsTable) || 'bookings';
+
+    if (!supabase) {
+      console.error('[admin] Supabase client unavailable.');
+      return;
+    }
+
+    // ---------- DOM ----------
+    const navItems = document.querySelectorAll('.sidebar-nav li');
+    const sections = document.querySelectorAll('.content-section');
+
+    const requestBody = document.getElementById('bookings-body');
+    const acceptedBody = document.getElementById('accepted-body');
+    const declinedBody = document.getElementById('declined-body');
+    const eventBody = document.getElementById('event-body');
+    const recentBody = document.querySelector('#recent-bookings tbody');
+
+    const requestSearch = document.getElementById('search-bookings');
+    const acceptedSearch = document.getElementById('search-accepted');
+    const declinedSearch = document.getElementById('search-declined');
+    const eventSearch = document.getElementById('search-event');
+
+    const refreshBtns = {
+      bookings: document.getElementById('refresh-bookings'),
+      accepted: document.getElementById('refresh-accepted'),
+      declined: document.getElementById('refresh-declined'),
+      event: document.getElementById('refresh-event'),
+    };
+
+    const stats = {
+      request: document.getElementById('request-booking-count'),
+      accepted: document.getElementById('accepted-booking-count'),
+      week: document.getElementById('incoming-week-count'),
+      month: document.getElementById('incoming-month-count'),
+      year: document.getElementById('incoming-year-count'),
+    };
+
+    const detailsModal = document.getElementById('bookingModal');
+    const detailsBody = document.getElementById('modal-body');
+    const declineModal = document.getElementById('declineReasonModal');
+    const declineReasonInput = document.getElementById('declineReason');
+    const acceptModal = document.getElementById('acceptModal');
+    const acceptSummary = document.getElementById('accept-summary');
+    const acceptTotalInput = document.getElementById('accept-total');
+    const acceptDownpaymentPreview = document.getElementById('accept-downpayment-preview');
+    const acceptNoteInput = document.getElementById('accept-note');
+    const acceptSendEmailToggle = document.getElementById('accept-send-email');
+    const acceptFeedback = document.getElementById('accept-feedback');
+    const acceptConfirmBtn = document.getElementById('acceptModalConfirm');
+    const acceptConfirmLabel = document.getElementById('acceptModalConfirmLabel');
+    const acceptCancelBtn = document.getElementById('acceptModalCancel');
+    const acceptCloseBtn = document.getElementById('acceptModalClose');
+
+    // ---------- State ----------
+    let allBookings = [];
+    let currentDeclineId = null;
+    let currentAcceptId = null;
+    const search = { request: '', accepted: '', declined: '', event: '' };
+
+    // ---------- Helpers ----------
+    const escapeHtml = (window.LP && window.LP.escapeHtml) || function (v) {
+      return v == null ? '' : String(v);
+    };
+
+    function eventLabel(b) {
+      if (b.event_type === 'other' && b.other_event_type) return b.other_event_type;
+      return b.event_type || '';
+    }
+
+    function formatTimestamp(value) {
+      if (!value) return 'N/A';
+      try {
+        return new Date(value).toLocaleString('en-US', {
+          month: 'short', day: 'numeric', year: 'numeric',
+          hour: '2-digit', minute: '2-digit',
+        });
+      } catch (_) {
+        return 'N/A';
+      }
+    }
+
+    function statusBadge(status) {
+      const s = (status || 'pending').toLowerCase();
+      const safeClass = /^[a-z]+$/.test(s) ? s : 'pending';
+      return `<span class="status-badge status-${safeClass}">${escapeHtml(s)}</span>`;
+    }
+
+    function eventDateObj(b) {
+      const iso = dates.normalizeEventDate(b.event_date);
+      return iso ? new Date(`${iso}T12:00:00`) : null;
+    }
+
+    function matchesSearch(b, query) {
+      if (!query) return true;
+      const q = query.toLowerCase();
+      return [
+        b.name, b.email, b.phone, b.venue, b.service_type,
+        b.event_type, b.other_event_type, b.message, b.decline_reason,
+        dates.formatLong(b.event_date),
+      ]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(q));
+    }
+
+    // ---------- Data ----------
+    async function loadBookings() {
+      try {
+        const { data, error } = await supabase
+          .from(tableName)
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        allBookings = data || [];
+        renderAll();
+      } catch (err) {
+        console.error('[admin] Failed to load bookings:', err);
+        const msg = err.code === '42501' || /permission denied/i.test(err.message || '')
+          ? 'Permission denied. Add a SELECT policy for anon users on the bookings table.'
+          : err.message || 'Failed to load bookings';
+        const errorRow = `<tr><td colspan="6" style="color:red; text-align:center;">${escapeHtml(msg)}</td></tr>`;
+        if (requestBody) requestBody.innerHTML = errorRow;
+        if (acceptedBody) acceptedBody.innerHTML = errorRow;
+        if (declinedBody) declinedBody.innerHTML = errorRow;
+        if (eventBody) eventBody.innerHTML = errorRow;
+        if (recentBody) recentBody.innerHTML = '';
+        Object.values(stats).forEach((el) => { if (el) el.textContent = '0'; });
+      }
+    }
+
+    async function updateStatus(id, status, reason) {
+      try {
+        const update = { status };
+        if (reason) update.decline_reason = reason;
+        if (status !== 'declined') update.decline_reason = null;
+        const { error } = await supabase
+          .from(tableName)
+          .update(update)
+          .eq('id', id);
+        if (error) {
+          if (reason && /decline_reason/.test(error.message || '')) {
+            throw new Error(
+              'Missing column "decline_reason". Add it in Supabase: ALTER TABLE bookings ADD COLUMN decline_reason text;'
+            );
+          }
+          throw error;
+        }
+        await loadBookings();
+      } catch (err) {
+        console.error('[admin] Update failed:', err);
+        alert('Failed to update status: ' + err.message);
+      }
+    }
+
+    // ---------- Render ----------
+    function renderAll() {
+      renderStats();
+      renderRecent();
+      renderRequest();
+      renderAccepted();
+      renderDeclined();
+      renderEvent();
+    }
+
+    function renderStats() {
+      const pending = allBookings.filter((b) => !b.status || b.status === 'pending');
+      const accepted = allBookings.filter((b) => b.status === 'accepted');
+      if (stats.request) stats.request.textContent = pending.length;
+      if (stats.accepted) stats.accepted.textContent = accepted.length;
+
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const in7 = new Date(today); in7.setDate(today.getDate() + 7);
+      const in30 = new Date(today); in30.setDate(today.getDate() + 30);
+      const in365 = new Date(today); in365.setDate(today.getDate() + 365);
+
+      let week = 0, month = 0, year = 0;
+      accepted.forEach((b) => {
+        const d = eventDateObj(b);
+        if (!d || d < today) return;
+        if (d < in7) week++;
+        if (d < in30) month++;
+        if (d < in365) year++;
+      });
+      if (stats.week) stats.week.textContent = week;
+      if (stats.month) stats.month.textContent = month;
+      if (stats.year) stats.year.textContent = year;
+    }
+
+    function renderRecent() {
+      if (!recentBody) return;
+      const rows = allBookings.slice(0, 5).map((b) => `
+        <tr>
+          <td>${escapeHtml(b.name) || 'N/A'}</td>
+          <td>${escapeHtml(eventLabel(b)) || 'N/A'}</td>
+          <td>${escapeHtml(dates.formatLong(b.event_date)) || 'N/A'}</td>
+        </tr>`).join('');
+      recentBody.innerHTML = rows || '<tr><td colspan="3">No bookings yet.</td></tr>';
+    }
+
+    function tableRow(b, actionsHtml) {
+      return `
+        <tr>
+          <td>${escapeHtml(formatTimestamp(b.created_at))}</td>
+          <td>${escapeHtml(b.name) || 'N/A'}</td>
+          <td>${escapeHtml(b.email) || 'N/A'}</td>
+          <td>${escapeHtml(eventLabel(b)) || 'N/A'}</td>
+          <td>${escapeHtml(b.service_type) || 'N/A'}</td>
+          <td>${actionsHtml}</td>
+        </tr>`;
+    }
+
+    function viewBtn(b) {
+      const safeId = encodeURIComponent(b.id);
+      return `<button class="btn-view" data-action="view" data-id="${safeId}"><i class="bi bi-eye"></i> View</button>`;
+    }
+
+    function renderRequest() {
+      if (!requestBody) return;
+      const rows = allBookings
+        .filter((b) => !b.status || b.status === 'pending')
+        .filter((b) => matchesSearch(b, search.request));
+      if (!rows.length) {
+        requestBody.innerHTML = '<tr><td colspan="6">No pending bookings found.</td></tr>';
+        return;
+      }
+      requestBody.innerHTML = rows.map((b) => tableRow(b, `
+        ${viewBtn(b)}
+        <button class="btn-accept" data-action="accept" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-check-lg"></i> Accept</button>
+        <button class="btn-decline" data-action="decline" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-x-lg"></i> Decline</button>
+      
+      `)).join('');
+    }
+
+    function renderAccepted() {
+      if (!acceptedBody) return;
+      const rows = allBookings
+        .filter((b) => b.status === 'accepted')
+        .filter((b) => matchesSearch(b, search.accepted));
+      if (!rows.length) {
+        acceptedBody.innerHTML = '<tr><td colspan="6">No accepted bookings found.</td></tr>';
+        return;
+      }
+      acceptedBody.innerHTML = rows.map((b) => tableRow(b, viewBtn(b))).join('');
+    }
+
+    function renderDeclined() {
+      if (!declinedBody) return;
+      const rows = allBookings
+        .filter((b) => b.status === 'declined')
+        .filter((b) => matchesSearch(b, search.declined));
+      if (!rows.length) {
+        declinedBody.innerHTML = '<tr><td colspan="6">No declined bookings.</td></tr>';
+        return;
+      }
+      declinedBody.innerHTML = rows.map((b) => tableRow(b, `
+        ${viewBtn(b)}
+        <button class="btn-restore" data-action="restore" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-arrow-counterclockwise"></i> Restore</button>
+      `)).join('');
+    }
+
+    function renderEvent() {
+      if (!eventBody) return;
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const upcoming = allBookings
+        .filter((b) => b.status === 'accepted' || b.status === 'completed')
+        .filter((b) => matchesSearch(b, search.event))
+        .map((b) => ({ b, d: eventDateObj(b) }))
+        .sort((a, z) => {
+          if (!a.d) return 1;
+          if (!z.d) return -1;
+          return a.d - z.d;
+        });
+
+      if (!upcoming.length) {
+        eventBody.innerHTML = '<tr><td colspan="6">No events to show.</td></tr>';
+        return;
+      }
+
+      eventBody.innerHTML = upcoming.map(({ b, d }) => {
+        const isPast = d && d < today;
+        const dateLabel = dates.formatLong(b.event_date) || 'TBD';
+        const status = b.status || 'accepted';
+        const actions = status === 'completed'
+          ? `${viewBtn(b)}<button class="btn-restore" data-action="restore" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-arrow-counterclockwise"></i> Reopen</button>`
+          : `${viewBtn(b)}
+             <button class="btn-complete" data-action="complete" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-check2-circle"></i> Mark completed</button>
+             <button class="btn-cancel-event" data-action="cancel" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-slash-circle"></i> Cancel</button>`;
+        return `
+          <tr class="${isPast && status !== 'completed' ? 'lp-event-overdue' : ''}">
+            <td>${escapeHtml(dateLabel)}</td>
+            <td>${escapeHtml(b.name) || 'N/A'}</td>
+            <td>${escapeHtml(eventLabel(b)) || 'N/A'}</td>
+            <td>${escapeHtml(b.service_type) || 'N/A'}</td>
+            <td>${statusBadge(status)}</td>
+            <td>${actions}</td>
+          </tr>`;
+      }).join('');
+    }
+
+    // ---------- Modals ----------
+    function showDetails(b) {
+      const eventType = eventLabel(b);
+      const status = b.status || 'pending';
+      const submitted = formatTimestamp(b.created_at);
+      detailsBody.innerHTML = `
+        <div class="booking-detail"><span class="detail-label">Name:</span> <span class="detail-value">${escapeHtml(b.name) || 'N/A'}</span></div>
+        <div class="booking-detail"><span class="detail-label">Email:</span> <span class="detail-value">${escapeHtml(b.email) || 'N/A'}</span></div>
+        <div class="booking-detail"><span class="detail-label">Phone:</span> <span class="detail-value">${escapeHtml(b.phone) || 'N/A'}</span></div>
+        <div class="booking-detail"><span class="detail-label">Event Type:</span> <span class="detail-value">${escapeHtml(eventType) || 'N/A'}</span></div>
+        <div class="booking-detail"><span class="detail-label">Event Date:</span> <span class="detail-value">${escapeHtml(dates.formatLong(b.event_date)) || 'N/A'}</span></div>
+        <div class="booking-detail"><span class="detail-label">Venue:</span> <span class="detail-value">${escapeHtml(b.venue) || 'N/A'}</span></div>
+        <div class="booking-detail"><span class="detail-label">Service:</span> <span class="detail-value">${escapeHtml(b.service_type) || 'N/A'}</span></div>
+        <div class="booking-detail"><span class="detail-label">Message:</span> <span class="detail-value">${escapeHtml(b.message) || '—'}</span></div>
+        <div class="booking-detail"><span class="detail-label">Status:</span> <span class="detail-value">${statusBadge(status)}</span></div>
+        ${b.decline_reason ? `<div class="booking-detail"><span class="detail-label">Decline reason:</span> <span class="detail-value">${escapeHtml(b.decline_reason)}</span></div>` : ''}
+        <div class="booking-detail"><span class="detail-label">Submitted:</span> <span class="detail-value">${escapeHtml(submitted)}</span></div>`;
+      detailsModal.style.display = 'block';
+    }
+
+    function closeDetails() { detailsModal.style.display = 'none'; }
+
+    function openDecline(id) {
+      currentDeclineId = id;
+      declineReasonInput.value = '';
+      declineModal.style.display = 'block';
+    }
+
+    function closeDecline() {
+      declineModal.style.display = 'none';
+      declineReasonInput.value = '';
+      currentDeclineId = null;
+    }
+
+    function confirmDecline() {
+      const reason = declineReasonInput.value.trim();
+      if (!reason) {
+        alert('Please enter a decline reason.');
+        return;
+      }
+      if (!currentDeclineId) return;
+      const id = currentDeclineId;
+      closeDecline();
+      updateStatus(id, 'declined', reason);
+    }
+
+    // ---------- Accept modal (with email) ----------
+    function formatPHP(amount) {
+      if (amount == null || Number.isNaN(Number(amount))) return '';
+      return `\u20B1${Number(amount).toLocaleString('en-PH', {
+        minimumFractionDigits: 2, maximumFractionDigits: 2,
+      })}`;
+    }
+
+    function updateDownpaymentPreview() {
+      if (!acceptDownpaymentPreview) return;
+      const raw = parseFloat(acceptTotalInput && acceptTotalInput.value);
+      if (!isNaN(raw) && raw > 0) {
+        const dp = raw * 0.5;
+        acceptDownpaymentPreview.textContent = `Downpayment shown to client: ${formatPHP(dp)} (50% of ${formatPHP(raw)})`;
+        acceptDownpaymentPreview.classList.add('is-active');
+      } else {
+        acceptDownpaymentPreview.textContent = 'Downpayment shown to client: 50% of the agreed total';
+        acceptDownpaymentPreview.classList.remove('is-active');
+      }
+    }
+
+    function setAcceptFeedback(kind, text) {
+      if (!acceptFeedback) return;
+      acceptFeedback.className = 'accept-feedback';
+      if (kind) acceptFeedback.classList.add(`is-${kind}`);
+      acceptFeedback.textContent = text || '';
+    }
+
+    function setAcceptConfirmLabel() {
+      if (!acceptConfirmLabel) return;
+      const sendEmail = acceptSendEmailToggle ? acceptSendEmailToggle.checked : true;
+      acceptConfirmLabel.textContent = sendEmail ? 'Accept & Send Email' : 'Accept (no email)';
+    }
+
+    function openAccept(booking) {
+      if (!acceptModal) {
+        // Fallback if markup somehow missing.
+        updateStatus(booking.id, 'accepted');
+        return;
+      }
+      currentAcceptId = booking.id;
+      const eventType = eventLabel(booking) || 'Event';
+      const eventDate = dates.formatLong(booking.event_date) || 'TBD';
+      if (acceptSummary) {
+        acceptSummary.innerHTML = `
+          <strong>${escapeHtml(booking.name) || 'Client'}</strong>
+          &middot; ${escapeHtml(eventType)}
+          &middot; ${escapeHtml(eventDate)}
+          <br>
+          <span class="accept-summary-email">${escapeHtml(booking.email) || 'no email'}</span>`;
+      }
+      if (acceptTotalInput) acceptTotalInput.value = '';
+      if (acceptNoteInput) acceptNoteInput.value = '';
+      if (acceptSendEmailToggle) acceptSendEmailToggle.checked = !!booking.email;
+      setAcceptFeedback(null, '');
+      updateDownpaymentPreview();
+      setAcceptConfirmLabel();
+      acceptModal.style.display = 'block';
+      setTimeout(() => acceptTotalInput && acceptTotalInput.focus(), 30);
+    }
+
+    function closeAccept() {
+      if (acceptModal) acceptModal.style.display = 'none';
+      currentAcceptId = null;
+      setAcceptFeedback(null, '');
+    }
+
+    async function sendAcceptanceEmail({ bookingId, totalPrice, note }) {
+      const auth = window.LP && window.LP.adminAuth;
+      const token = auth && auth.getToken ? auth.getToken() : '';
+      if (!token) {
+        return { ok: false, error: 'Admin token missing. Please sign out and sign back in.' };
+      }
+      try {
+        const res = await fetch('/api/send-acceptance-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            booking_id: bookingId,
+            total_price: totalPrice,
+            note: note,
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          return { ok: false, error: data.error || `Email API ${res.status}` };
+        }
+        return { ok: true, id: data.id, to: data.to };
+      } catch (err) {
+        return { ok: false, error: err.message || 'Network error' };
+      }
+    }
+
+    async function confirmAccept() {
+      if (!currentAcceptId) return;
+      const id = currentAcceptId;
+      const totalRaw = acceptTotalInput && acceptTotalInput.value;
+      const totalPrice = totalRaw && !isNaN(parseFloat(totalRaw)) ? parseFloat(totalRaw) : null;
+      const note = acceptNoteInput && acceptNoteInput.value.trim();
+      const sendEmail = acceptSendEmailToggle ? acceptSendEmailToggle.checked : true;
+
+      acceptConfirmBtn.disabled = true;
+      acceptCancelBtn && (acceptCancelBtn.disabled = true);
+      setAcceptFeedback('working', 'Updating booking…');
+
+      try {
+        const update = { status: 'accepted', decline_reason: null };
+        const { error } = await supabase
+          .from(tableName)
+          .update(update)
+          .eq('id', id);
+        if (error) throw error;
+
+        if (!sendEmail) {
+          setAcceptFeedback('success', 'Booking accepted. (Email skipped.)');
+          await loadBookings();
+          setTimeout(closeAccept, 700);
+          return;
+        }
+
+        setAcceptFeedback('working', 'Sending acceptance email…');
+        const result = await sendAcceptanceEmail({
+          bookingId: id,
+          totalPrice,
+          note: note || null,
+        });
+        if (result.ok) {
+          setAcceptFeedback('success', `Booking accepted and email sent to ${result.to}.`);
+          await loadBookings();
+          setTimeout(closeAccept, 1100);
+        } else {
+          // The DB update succeeded so the booking IS accepted; only the
+          // email failed. Keep the modal open and surface the reason so the
+          // admin can retry or notify the client manually.
+          setAcceptFeedback('error', `Booking accepted, but email failed: ${result.error}. You can retry or notify the client manually.`);
+          await loadBookings();
+        }
+      } catch (err) {
+        console.error('[admin] Accept failed:', err);
+        setAcceptFeedback('error', `Failed to accept booking: ${err.message || err}`);
+      } finally {
+        acceptConfirmBtn.disabled = false;
+        acceptCancelBtn && (acceptCancelBtn.disabled = false);
+      }
+    }
+
+    if (acceptTotalInput) {
+      acceptTotalInput.addEventListener('input', updateDownpaymentPreview);
+    }
+    if (acceptSendEmailToggle) {
+      acceptSendEmailToggle.addEventListener('change', setAcceptConfirmLabel);
+    }
+    if (acceptCancelBtn) acceptCancelBtn.addEventListener('click', closeAccept);
+    if (acceptCloseBtn) acceptCloseBtn.addEventListener('click', closeAccept);
+    if (acceptConfirmBtn) acceptConfirmBtn.addEventListener('click', confirmAccept);
+
+    // Expose modal close handlers to inline onclick attributes (kept for compatibility).
+    window.closeDeclineModal = closeDecline;
+    window.confirmDecline = confirmDecline;
+
+    // ---------- Wiring ----------
+    function findById(id) {
+      return allBookings.find((b) => String(b.id) === String(id));
+    }
+
+    function bindTableActions(tbody) {
+      if (!tbody) return;
+      tbody.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-action]');
+        if (!btn) return;
+        const id = decodeURIComponent(btn.dataset.id || '');
+        const action = btn.dataset.action;
+        const booking = findById(id);
+        if (!booking) return;
+        switch (action) {
+          case 'view': showDetails(booking); break;
+          case 'accept': openAccept(booking); break;
+          case 'restore': updateStatus(booking.id, 'accepted'); break;
+          case 'decline': openDecline(booking.id); break;
+          case 'complete': updateStatus(booking.id, 'completed'); break;
+          case 'cancel':
+            if (confirm('Cancel this event? It will be moved to declined with reason "Cancelled by admin".')) {
+              updateStatus(booking.id, 'declined', 'Cancelled by admin');
+            }
+            break;
+          default: break;
+        }
+      });
+    }
+
+    function bindSearch(input, key, render) {
+      if (!input) return;
+      input.addEventListener('input', () => {
+        search[key] = input.value.trim();
+        render();
+      });
+    }
+
+    bindTableActions(requestBody);
+    bindTableActions(acceptedBody);
+    bindTableActions(declinedBody);
+    bindTableActions(eventBody);
+
+    bindSearch(requestSearch, 'request', renderRequest);
+    bindSearch(acceptedSearch, 'accepted', renderAccepted);
+    bindSearch(declinedSearch, 'declined', renderDeclined);
+    bindSearch(eventSearch, 'event', renderEvent);
+
+    Object.values(refreshBtns).forEach((btn) => {
+      if (btn) btn.addEventListener('click', loadBookings);
+    });
+
+    // Modal close handlers
+    const detailsClose = document.querySelector('#bookingModal .close-modal');
+    if (detailsClose) detailsClose.addEventListener('click', closeDetails);
+    window.addEventListener('click', (event) => {
+      if (event.target === detailsModal) closeDetails();
+      if (event.target === declineModal) closeDecline();
+      if (event.target === acceptModal) closeAccept();
+    });
+
+    // Sidebar nav
+    navItems.forEach((item) => {
+      item.addEventListener('click', function () {
+        navItems.forEach((n) => n.classList.remove('active'));
+        this.classList.add('active');
+        const sectionId = this.dataset.section;
+        sections.forEach((sec) => sec.classList.remove('active'));
+        const target = document.getElementById(sectionId + '-section');
+        if (target) target.classList.add('active');
+      });
+    });
+
+    // Lock / sign-out button (in sidebar footer)
+    const lockBtn = document.getElementById('admin-lock-btn');
+    if (lockBtn) {
+      lockBtn.addEventListener('click', () => {
+        if (window.LP && window.LP.adminAuth) {
+          window.LP.adminAuth.lock();
+        }
+      });
+    }
+
+    // Mobile sidebar toggle
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebarEl = document.querySelector('.sidebar');
+    if (sidebarToggle && sidebarEl) {
+      sidebarToggle.addEventListener('click', () => {
+        sidebarEl.classList.toggle('is-open');
+      });
+      // Close mobile sidebar when a nav item is clicked
+      navItems.forEach((item) => {
+        item.addEventListener('click', () => {
+          if (window.matchMedia('(max-width: 900px)').matches) {
+            sidebarEl.classList.remove('is-open');
+          }
+        });
+      });
+    }
+
+    function startData() {
+      if (supabase.channel) {
+        supabase
+          .channel('lp-bookings-admin')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: tableName },
+            () => loadBookings()
+          )
+          .subscribe();
+      }
+      loadBookings();
+    }
+
+    // Defer data load until the password gate is satisfied. If the auth helper
+    // is missing, behave like before (load immediately) so admin still works.
+    const auth = window.LP && window.LP.adminAuth;
+    if (!auth || auth.isUnlocked()) {
+      startData();
+    } else {
+      document.addEventListener(auth.UNLOCK_EVENT, startData, { once: true });
+    }
+  });
+})();
