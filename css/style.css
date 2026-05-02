@@ -721,3 +721,64 @@ footer p {
     font-size: 14px;
   }
 }
+
+/* ===== Header: Booking Status pill (right-aligned) ===== */
+.header-status-btn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: rgb(156, 136, 77);
+  color: #000;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.header-status-btn i {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.header-status-btn:hover {
+  background: rgb(180, 158, 95);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(156, 136, 77, 0.35);
+}
+
+.header-status-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.header-status-btn.active {
+  background: transparent;
+  color: rgb(156, 136, 77);
+  border-color: rgb(156, 136, 77);
+}
+
+.header-status-btn.active:hover {
+  background: rgba(156, 136, 77, 0.12);
+}
+
+@media (max-width: 600px) {
+  .header-status-btn {
+    padding: 7px 14px;
+    font-size: 0.7rem;
+    letter-spacing: 0.3px;
+  }
+  .header-status-btn span {
+    display: none;
+  }
+  .header-status-btn i {
+    font-size: 1.05rem;
+  }
+}

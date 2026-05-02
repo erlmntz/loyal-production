@@ -198,7 +198,7 @@
 
         if (error) {
           console.error('[booking] Insert failed:', error);
-          setFeedback('error', `Could not submit your booking: ${error.message}`);
+          setFeedback('error', `Could not submit your booking: ${escapeHtml(error.message)}`);
           return;
         }
         showConfirmation(data || payload);

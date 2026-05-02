@@ -216,9 +216,7 @@
 
     function viewBtn(b) {
       const safeId = encodeURIComponent(b.id);
-      return `<button class="action-btn btn-view" data-action="view" data-id="${safeId}">
-                <i class="bi bi-eye"></i> View
-              </button>`;
+      return `<button class="btn-view" data-action="view" data-id="${safeId}"><i class="bi bi-eye"></i> View</button>`;
     }
 
     function renderRequest() {
@@ -232,8 +230,8 @@
       }
       requestBody.innerHTML = rows.map((b) => tableRow(b, `
         ${viewBtn(b)}
-        <button class="action-btn btn-accept" data-action="accept" data-id="${encodeURIComponent(b.id)}">Accept</button>
-        <button class="action-btn btn-decline" data-action="decline" data-id="${encodeURIComponent(b.id)}">Decline</button>
+        <button class="btn-accept" data-action="accept" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-check-lg"></i> Accept</button>
+        <button class="btn-decline" data-action="decline" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-x-lg"></i> Decline</button>
       `)).join('');
     }
 
@@ -260,7 +258,7 @@
       }
       declinedBody.innerHTML = rows.map((b) => tableRow(b, `
         ${viewBtn(b)}
-        <button class="action-btn btn-accept" data-action="accept" data-id="${encodeURIComponent(b.id)}">Restore</button>
+        <button class="btn-restore" data-action="accept" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-arrow-counterclockwise"></i> Restore</button>
       `)).join('');
     }
 
@@ -287,10 +285,10 @@
         const dateLabel = dates.formatLong(b.event_date) || 'TBD';
         const status = b.status || 'accepted';
         const actions = status === 'completed'
-          ? `${viewBtn(b)}<button class="action-btn btn-accept" data-action="accept" data-id="${encodeURIComponent(b.id)}">Reopen</button>`
+          ? `${viewBtn(b)}<button class="btn-restore" data-action="accept" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-arrow-counterclockwise"></i> Reopen</button>`
           : `${viewBtn(b)}
-             <button class="action-btn btn-accept" data-action="complete" data-id="${encodeURIComponent(b.id)}">Mark completed</button>
-             <button class="action-btn btn-decline" data-action="cancel" data-id="${encodeURIComponent(b.id)}">Cancel</button>`;
+             <button class="btn-complete" data-action="complete" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-check2-circle"></i> Mark completed</button>
+             <button class="btn-cancel-event" data-action="cancel" data-id="${encodeURIComponent(b.id)}"><i class="bi bi-slash-circle"></i> Cancel</button>`;
         return `
           <tr class="${isPast && status !== 'completed' ? 'lp-event-overdue' : ''}">
             <td>${escapeHtml(dateLabel)}</td>
@@ -424,18 +422,54 @@
       });
     });
 
-    // Realtime updates (fall back to manual refresh if subscription fails)
-    if (supabase.channel) {
-      supabase
-        .channel('lp-bookings-admin')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: tableName },
-          () => loadBookings()
-        )
-        .subscribe();
+    // Lock / sign-out button (in sidebar footer)
+    const lockBtn = document.getElementById('admin-lock-btn');
+    if (lockBtn) {
+      lockBtn.addEventListener('click', () => {
+        if (window.LP && window.LP.adminAuth) {
+          window.LP.adminAuth.lock();
+        }
+      });
     }
 
-    loadBookings();
+    // Mobile sidebar toggle
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebarEl = document.querySelector('.sidebar');
+    if (sidebarToggle && sidebarEl) {
+      sidebarToggle.addEventListener('click', () => {
+        sidebarEl.classList.toggle('is-open');
+      });
+      // Close mobile sidebar when a nav item is clicked
+      navItems.forEach((item) => {
+        item.addEventListener('click', () => {
+          if (window.matchMedia('(max-width: 900px)').matches) {
+            sidebarEl.classList.remove('is-open');
+          }
+        });
+      });
+    }
+
+    function startData() {
+      if (supabase.channel) {
+        supabase
+          .channel('lp-bookings-admin')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: tableName },
+            () => loadBookings()
+          )
+          .subscribe();
+      }
+      loadBookings();
+    }
+
+    // Defer data load until the password gate is satisfied. If the auth helper
+    // is missing, behave like before (load immediately) so admin still works.
+    const auth = window.LP && window.LP.adminAuth;
+    if (!auth || auth.isUnlocked()) {
+      startData();
+    } else {
+      document.addEventListener(auth.UNLOCK_EVENT, startData, { once: true });
+    }
   });
 })();

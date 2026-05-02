@@ -17,12 +17,17 @@
   <!-- Custom Styles -->
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body data-locked="true">
+  <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle navigation">
+    <i class="bi bi-list"></i>
+  </button>
+
   <div class="dashboard-container">
     <aside class="sidebar">
       <div class="sidebar-header">
         <img src="images/LP_logonobg.png" alt="Loyal Production" class="logo">
         <h2>Loyal Production</h2>
+        <p class="sidebar-tag">Admin</p>
       </div>
       <nav class="sidebar-nav">
         <ul>
@@ -34,7 +39,11 @@
         </ul>
       </nav>
       <div class="sidebar-footer">
-        <p>&copy; 2026 Loyal Prod.</p>
+        <button type="button" class="sidebar-lock" id="admin-lock-btn">
+          <i class="bi bi-box-arrow-left"></i>
+          <span>Sign out</span>
+        </button>
+        <p class="sidebar-copy">&copy; 2026 Loyal Prod.</p>
       </div>
     </aside>
 
@@ -239,6 +248,7 @@
   <script src="../js/lib/supabase-client.js"></script>
   <script src="../js/lib/date-utils.js"></script>
   <script src="../js/lib/escape.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/admin.js"></script>
 </body>
 </html>
