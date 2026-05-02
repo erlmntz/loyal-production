@@ -398,15 +398,110 @@ h1, h2, h3 {
   word-break: break-word;
 }
 
-/* ========== EVENT SECTION PLACEHOLDER ========== */
-#event-section {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  text-align: center;
-  color: #666;
+/* ========== STATUS BADGE ADDITIONS ========== */
+.status-badge.completed {
+  background: #cce5ff;
+  color: #004085;
 }
+.status-badge.cancelled {
+  background: #e2e3e5;
+  color: #383d41;
+}
+.status-completed { background: #007bff; color: #fff; }
+.status-cancelled { background: #6c757d; color: #fff; }
+
+/* ========== SECTION TOOLS (search + refresh) ========== */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.section-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  min-width: 220px;
+  background: #fff;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #b89b5e;
+  box-shadow: 0 0 0 2px rgba(184, 155, 94, 0.15);
+}
+
+.section-hint {
+  margin: -0.5rem 0 1rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* ========== EVENT TABLE ROW STATES ========== */
+.lp-event-overdue {
+  background: #fff8e1;
+}
+.lp-event-overdue:hover {
+  background: #fff0c2;
+}
+
+/* ========== FORCE-SHOW STAT CARDS ========== */
+/* All stat cards must be visible (some legacy CSS may hide them). */
+.stat-card {
+  display: flex !important;
+}
+
+/* ========== DECLINE MODAL CONTROLS ========== */
+#declineReasonModal .modal-content {
+  max-width: 420px;
+}
+
+#declineReasonModal textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-confirm {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-confirm:hover { background: #c82333; }
+
+.btn-cancel {
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-cancel:hover { background: #5a6268; }
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {

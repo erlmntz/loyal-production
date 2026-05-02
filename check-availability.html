@@ -38,10 +38,9 @@
       <p>Select a date to see if we're available</p>
     </div>
 
-    <!-- GRID CONTENT (calendar + right panel) -->
     <div class="content-grid">
-      
-      <!-- LEFT SIDE - FULL MONTH CALENDAR -->
+
+      <!-- LEFT - FULL MONTH CALENDAR -->
       <div class="calendar-section" data-aos="fade-right">
         <div class="card">
           <h2><i class="bi bi-grid-3x3-gap-fill"></i> Full month view</h2>
@@ -66,10 +65,9 @@
         </div>
       </div>
 
-      <!-- RIGHT SIDE - STATUS & SEARCH & LIST -->
+      <!-- RIGHT - SEARCH, STATUS, LIST -->
       <div class="status-section" data-aos="fade-left">
-        
-        <!-- SEARCH CARD -->
+
         <div class="card">
           <h2><i class="bi bi-search"></i> Search Date</h2>
           <div class="search-box">
@@ -78,7 +76,6 @@
           </div>
         </div>
 
-        <!-- STATUS CARD -->
         <div class="card">
           <div class="status-header"><i class="bi bi-info-circle"></i><h2>Date Status</h2></div>
           <div id="result" class="result-area">
@@ -91,7 +88,6 @@
           </div>
         </div>
 
-        <!-- BOOKED DATES LIST -->
         <div class="card">
           <h2><i class="bi bi-list-check"></i> Booked Dates</h2>
           <div id="bookedList" class="dates-list">
@@ -101,7 +97,6 @@
       </div>
     </div>
 
-    <!-- BACK BUTTON -->
     <div class="back-section">
       <a href="index.html" class="back-link"><i class="bi bi-arrow-left"></i> Back to Home</a>
     </div>
@@ -113,222 +108,11 @@
   <p>&copy; 2026 Loyal Production. All rights reserved.</p>
 </footer>
 
-<!-- SCRIPTS -->
+<!-- Scripts -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    AOS.init();
-
-    // ----- ELEMENTS -----
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
-    const resultDiv = document.getElementById('result');
-    const bookedList = document.getElementById('bookedList');
-    const todayBtn = document.getElementById('todayBtn');
-    const tomorrowBtn = document.getElementById('tomorrowBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const prevMonthBtn = document.getElementById('prevMonthBtn');
-    const nextMonthBtn = document.getElementById('nextMonthBtn');
-    const displayMonthYear = document.getElementById('displayMonthYear');
-    const calendarDaysGrid = document.getElementById('calendarDaysGrid');
-
-    // ----- STATE -----
-    let bookedDates = [];                // array of 'YYYY-MM-DD'
-    let currentDisplayDate = new Date(); // for calendar month
-    let selectedDateStr = null;          // currently highlighted date
-
-    // ----- HELPER: format to YYYY-MM-DD -----
-    function formatDate(date) {
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, '0');
-      const d = String(date.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
-    }
-
-    // ----- FETCH BOOKED DATES (from js/booked-dates.json) -----
-    function loadBookedDates() {
-      fetch('js/booked-dates.json')
-        .then(res => {
-          if (!res.ok) throw new Error('HTTP error ' + res.status);
-          return res.json();
-        })
-        .then(data => {
-          bookedDates = data;  // expected array of strings
-          renderCalendar(currentDisplayDate);
-          showBookedDatesList();
-        })
-        .catch(err => {
-          console.error('Fetch error:', err);
-          bookedList.innerHTML = '<div class="loading" style="color:#dc2626;"><i class="bi bi-exclamation-triangle-fill"></i> Failed to load dates</div>';
-          // fallback: still render calendar without booked data
-          renderCalendar(currentDisplayDate);
-        });
-    }
-
-    // ----- RENDER CALENDAR for given date (year/month) -----
-    function renderCalendar(date) {
-      const year = date.getFullYear();
-      const month = date.getMonth(); // 0-11
-
-      // update header
-      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      displayMonthYear.textContent = `${monthNames[month]} ${year}`;
-
-      // first day of month (0 = Sunday)
-      const firstDay = new Date(year, month, 1).getDay();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-      // clear grid
-      calendarDaysGrid.innerHTML = '';
-
-      // leading empty cells
-      for (let i = 0; i < firstDay; i++) {
-        const emptyCell = document.createElement('div');
-        emptyCell.className = 'calendar-day empty';
-        calendarDaysGrid.appendChild(emptyCell);
-      }
-
-      // today string for comparison
-      const todayStr = formatDate(new Date());
-
-      // fill days
-      for (let d = 1; d <= daysInMonth; d++) {
-        const cell = document.createElement('div');
-        cell.className = 'calendar-day';
-        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        cell.textContent = d;
-        cell.dataset.date = dateStr;
-
-        // mark booked (RED)
-        if (bookedDates.includes(dateStr)) {
-          cell.classList.add('booked');
-        }
-
-        // mark today
-        if (dateStr === todayStr) {
-          cell.classList.add('today');
-        }
-
-        // mark selected
-        if (dateStr === selectedDateStr) {
-          cell.classList.add('selected');
-        }
-
-        calendarDaysGrid.appendChild(cell);
-      }
-    }
-
-    // ----- SHOW BOOKED DATES LIST (right panel) -----
-    function showBookedDatesList() {
-      if (!bookedDates.length) {
-        bookedList.innerHTML = '<div class="loading"><i class="bi bi-calendar-check"></i> No booked dates</div>';
-        return;
-      }
-
-      const sorted = [...bookedDates].sort((a,b) => a.localeCompare(b));
-      let html = '';
-      sorted.forEach(date => {
-        const d = new Date(date);
-        const formatted = d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-        html += `<div class="date-item" data-date="${date}">
-          <span class="date"><i class="bi bi-calendar-x"></i> ${formatted}</span>
-          <span class="badge">Booked</span>
-        </div>`;
-      });
-      bookedList.innerHTML = html;
-
-      // attach click to each booked item
-      document.querySelectorAll('.date-item').forEach(item => {
-        item.addEventListener('click', function() {
-          const d = this.dataset.date;
-          goToDate(d);
-        });
-      });
-    }
-
-    // ----- CHECK DATE STATUS (updates result area) -----
-    function checkDate(dateStr) {
-      const isBooked = bookedDates.includes(dateStr);
-      const today = new Date();
-      const todayStr = formatDate(today);
-      const inputDate = new Date(dateStr + 'T12:00:00'); // avoid timezone issues
-      const formatted = inputDate.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-
-      let html = '';
-      if (isBooked) {
-        html = `<div class="status-message message-booked"><i class="bi bi-x-circle-fill"></i><div class="message-content"><h3>Booked</h3><p>${formatted} is already taken</p></div></div>`;
-      } else {
-        const status = dateStr < todayStr ? 'Past' : 'Available';
-        html = `<div class="status-message message-available"><i class="bi bi-check-circle-fill"></i><div class="message-content"><h3>${status}</h3><p>${formatted} - ${status === 'Available' ? 'Free! Book now' : 'This date has passed'}</p></div></div>`;
-      }
-      resultDiv.innerHTML = html;
-    }
-
-    // ----- GO TO DATE: update calendar month & highlight, show status -----
-    function goToDate(dateStr) {
-      // set selected
-      selectedDateStr = dateStr;
-
-      // parse date to navigate month
-      const [y, m, d] = dateStr.split('-').map(Number);
-      const targetDate = new Date(y, m-1, 1); // first of month
-      currentDisplayDate = targetDate;
-      renderCalendar(currentDisplayDate);
-      checkDate(dateStr);
-      searchInput.value = dateStr;
-    }
-
-    // ----- navigate month -----
-    function changeMonth(delta) {
-      currentDisplayDate.setMonth(currentDisplayDate.getMonth() + delta);
-      renderCalendar(currentDisplayDate);
-      // keep selected highlight (if visible)
-    }
-
-    // ----- EVENT LISTENERS -----
-    prevMonthBtn.addEventListener('click', () => changeMonth(-1));
-    nextMonthBtn.addEventListener('click', () => changeMonth(1));
-
-    calendarDaysGrid.addEventListener('click', (e) => {
-      const cell = e.target.closest('.calendar-day');
-      if (!cell || cell.classList.contains('empty')) return;
-      const dateStr = cell.dataset.date;
-      if (dateStr) {
-        goToDate(dateStr);
-      }
-    });
-
-    searchBtn.addEventListener('click', () => {
-      const val = searchInput.value.trim();
-      if (val && /^\d{4}-\d{2}-\d{2}$/.test(val)) {
-        goToDate(val);
-      } else {
-        alert('Please enter date in YYYY-MM-DD format');
-      }
-    });
-    searchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') searchBtn.click(); });
-
-    todayBtn.addEventListener('click', () => {
-      const today = formatDate(new Date());
-      goToDate(today);
-    });
-
-    tomorrowBtn.addEventListener('click', () => {
-      const tom = new Date();
-      tom.setDate(tom.getDate() + 1);
-      goToDate(formatDate(tom));
-    });
-
-    clearBtn.addEventListener('click', () => {
-      selectedDateStr = null;
-      searchInput.value = '';
-      resultDiv.innerHTML = `<div class="placeholder"><i class="bi bi-calendar2-week"></i><p>Select a date</p></div>`;
-      renderCalendar(currentDisplayDate);  // clears highlight
-    });
-
-    // initial load
-    loadBookedDates();
-  });
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/lib/supabase-client.js"></script>
+<script src="js/lib/date-utils.js"></script>
+<script src="js/user/check-availability.js"></script>
 </body>
 </html>
