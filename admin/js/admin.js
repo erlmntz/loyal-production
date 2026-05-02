@@ -88,7 +88,8 @@
 
     function statusBadge(status) {
       const s = (status || 'pending').toLowerCase();
-      return `<span class="status-badge status-${s}">${escapeHtml(s)}</span>`;
+      const safeClass = /^[a-z]+$/.test(s) ? s : 'pending';
+      return `<span class="status-badge status-${safeClass}">${escapeHtml(s)}</span>`;
     }
 
     function eventDateObj(b) {
@@ -371,7 +372,7 @@
           case 'decline': openDecline(booking.id); break;
           case 'complete': updateStatus(booking.id, 'completed'); break;
           case 'cancel':
-            if (confirm('Cancel this event? It will move back to declined with no reason recorded.')) {
+            if (confirm('Cancel this event? It will be moved to declined with reason "Cancelled by admin".')) {
               updateStatus(booking.id, 'declined', 'Cancelled by admin');
             }
             break;
