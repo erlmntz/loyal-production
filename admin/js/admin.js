@@ -65,15 +65,9 @@
     const search = { request: '', accepted: '', declined: '', event: '' };
 
     // ---------- Helpers ----------
-    function escapeHtml(value) {
-      if (value === null || value === undefined) return '';
-      return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
+    const escapeHtml = (window.LP && window.LP.escapeHtml) || function (v) {
+      return v == null ? '' : String(v);
+    };
 
     function eventLabel(b) {
       if (b.event_type === 'other' && b.other_event_type) return b.other_event_type;

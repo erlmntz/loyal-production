@@ -13,6 +13,9 @@
     const supabase = window.LP && window.LP.supabase;
     const dates = window.LP && window.LP.dates;
     const tableName = (window.LP && window.LP.bookingsTable) || 'bookings';
+    const escapeHtml = (window.LP && window.LP.escapeHtml) || function (v) {
+      return v == null ? '' : String(v);
+    };
 
     const form = document.getElementById('lookup-form');
     const emailInput = document.getElementById('lookup-email');
@@ -33,11 +36,15 @@
         completed: 'Completed',
         cancelled: 'Cancelled',
       };
-      return `<span class="status-badge status-${s}">${labels[s] || s}</span>`;
+      // `s` is sanitized to a known status string above; only the label
+      // value (which is from a fixed map or a known string) goes into
+      // the DOM. Even so, escape both for defense in depth.
+      const safeClass = /^[a-z]+$/.test(s) ? s : 'pending';
+      return `<span class="status-badge status-${safeClass}">${escapeHtml(labels[s] || s)}</span>`;
     }
 
     function renderRow(row) {
-      const eventLabel =
+      const rawEventLabel =
         row.event_type === 'other' && row.other_event_type
           ? row.other_event_type
           : row.event_type;
@@ -48,17 +55,23 @@
           })
         : '';
       const reason = row.decline_reason
-        ? `<p class="status-reason"><strong>Reason:</strong> ${row.decline_reason}</p>`
+        ? `<p class="status-reason"><strong>Reason:</strong> ${escapeHtml(row.decline_reason)}</p>`
+        : '';
+      const eventLabel = escapeHtml(rawEventLabel || 'Event');
+      const serviceType = escapeHtml(row.service_type || '');
+      const eventDate = escapeHtml(dates.formatLong(row.event_date) || '—');
+      const venue = row.venue
+        ? `<p><strong>Venue:</strong> ${escapeHtml(row.venue)}</p>`
         : '';
       return `
         <article class="status-card">
           <header>
-            <h3>${eventLabel || 'Event'} &middot; ${row.service_type || ''}</h3>
+            <h3>${eventLabel} &middot; ${serviceType}</h3>
             ${statusBadge(row.status)}
           </header>
-          <p><strong>Event date:</strong> ${dates.formatLong(row.event_date) || '—'}</p>
-          ${row.venue ? `<p><strong>Venue:</strong> ${row.venue}</p>` : ''}
-          <p class="status-meta">Submitted ${created}</p>
+          <p><strong>Event date:</strong> ${eventDate}</p>
+          ${venue}
+          <p class="status-meta">Submitted ${escapeHtml(created)}</p>
           ${reason}
         </article>`;
     }
@@ -85,7 +98,7 @@
         resultsDiv.innerHTML = data.map(renderRow).join('');
       } catch (err) {
         console.error('[status] Lookup failed:', err);
-        resultsDiv.innerHTML = `<p class="form-msg form-msg-error">Could not load bookings: ${err.message}</p>`;
+        resultsDiv.innerHTML = `<p class="form-msg form-msg-error">Could not load bookings: ${escapeHtml(err && err.message)}</p>`;
       }
     }
 

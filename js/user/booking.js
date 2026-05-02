@@ -13,6 +13,9 @@
     const supabase = window.LP && window.LP.supabase;
     const dates = window.LP && window.LP.dates;
     const tableName = (window.LP && window.LP.bookingsTable) || 'bookings';
+    const escapeHtml = (window.LP && window.LP.escapeHtml) || function (v) {
+      return v == null ? '' : String(v);
+    };
 
     const form = document.getElementById('booking-form');
     const dateInput = document.getElementById('event-date');
@@ -141,14 +144,18 @@
     function showConfirmation(row) {
       form.style.display = 'none';
       const ref = row && row.id ? `#${String(row.id).slice(0, 8).toUpperCase()}` : '';
-      const eventLabel = dates.formatLong(row.event_date) || row.event_date;
+      const eventLabel = escapeHtml(dates.formatLong(row.event_date) || row.event_date);
+      const safeName = escapeHtml(row.name);
+      const safeEmail = escapeHtml(row.email);
+      const safeRef = escapeHtml(ref);
+      const trackHref = `status.html?email=${encodeURIComponent(row.email || '')}`;
       setFeedback(
         'success',
         `<h3>Booking request received</h3>
-         <p>Salamat${row.name ? `, <strong>${row.name}</strong>` : ''}! Naipasa na namin ang request mo for <strong>${eventLabel}</strong>.</p>
-         ${ref ? `<p>Reference: <code>${ref}</code></p>` : ''}
-         <p>We'll review your request and get back to you via email at <strong>${row.email}</strong> shortly.</p>
-         <p><a href="check-availability.html">Check availability</a> &middot; <a href="status.html?email=${encodeURIComponent(row.email)}">Track my booking</a> &middot; <a href="index.html">Back to home</a></p>`
+         <p>Salamat${safeName ? `, <strong>${safeName}</strong>` : ''}! Naipasa na namin ang request mo for <strong>${eventLabel}</strong>.</p>
+         ${safeRef ? `<p>Reference: <code>${safeRef}</code></p>` : ''}
+         <p>We'll review your request and get back to you via email at <strong>${safeEmail}</strong> shortly.</p>
+         <p><a href="check-availability.html">Check availability</a> &middot; <a href="${escapeHtml(trackHref)}">Track my booking</a> &middot; <a href="index.html">Back to home</a></p>`
       );
     }
 
